@@ -1,0 +1,14 @@
+{
+    "name": "minnpost/form-processor-mailchimp",
+    "type": "wordpress-plugin",
+    "authors": [
+        {
+            "name": "Jonathan Stegall",
+            "email": "jstegall@minnpost.com"
+        }
+    ],
+    "require": {
+        "drewm/mailchimp-api": "dev-master"
+    },
+    "minimum-stability": "dev"
+}
