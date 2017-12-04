@@ -48,11 +48,13 @@ class Form_Processor_MailChimp_MCWrapper {
 		}
 	}
 
-	public function load( $call ) {
+	public function load( $call = '' ) {
 		$cached = $this->wordpress->cache_get( $call );
 		if ( is_array( $cached ) ) {
+			//error_log( 'yep it is cached' );
 			return $cached;
 		} else {
+			//error_log( 'nope. cached is ' . print_r( $cached, true ) );
 			$data = $this->mailchimp_api->get( $call );
 			$cached = $this->wordpress->cache_set( $call, $data );
 			return $data;

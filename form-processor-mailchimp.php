@@ -10,7 +10,7 @@ License: GPL2+
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 */
 
-class Form_Processor_MailChimp extends WP_REST_Controller {
+class Form_Processor_MailChimp {
 
 	/**
 	 * This is our constructor
@@ -22,7 +22,7 @@ class Form_Processor_MailChimp extends WP_REST_Controller {
 		$this->version = '0.0.1';
 
 		//The namespace and version for the REST SERVER
-		$this->namespace = 'form_process_mc/v';
+		$this->namespace = 'form-processor-mc/v';
 		$this->api_version = '1';
 
 		$this->option_prefix = 'form_process_mc_';
@@ -55,7 +55,7 @@ class Form_Processor_MailChimp extends WP_REST_Controller {
 
 	private function processor() {
 		require_once( plugin_dir_path( __FILE__ ) . 'classes/class-form-processor-mailchimp-processor.php' );
-		$processor = new Form_Processor_MailChimp_Processor( $this->option_prefix, $this->version, $this->wordpress, $this->mailchimp );
+		$processor = new Form_Processor_MailChimp_Processor( $this->option_prefix, $this->version, $this->namespace, $this->api_version, $this->wordpress, $this->mailchimp );
 		return $processor;
 	}
 
