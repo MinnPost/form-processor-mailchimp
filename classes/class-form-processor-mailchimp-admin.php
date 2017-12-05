@@ -70,6 +70,7 @@ class Form_Processor_MailChimp_Admin {
 			'mc_settings' => 'MailChimp Settings',
 			'allowed_resources' => 'Allowed Resources',
 			'resource_settings' => 'Resource Settings',
+			'loaded_resources' => 'Loaded Resources',
 			//'subresource_settings' => 'Subresource Settings',
 			//'schedule' => 'Scheduling',
 		); // this creates the tabs for the admin
@@ -100,6 +101,9 @@ class Form_Processor_MailChimp_Admin {
 					require_once( plugin_dir_path( __FILE__ ) . '/../templates/admin/settings.php' );
 					break;
 				case 'resource_settings':
+					require_once( plugin_dir_path( __FILE__ ) . '/../templates/admin/settings.php' );
+					break;
+				case 'loaded_resources':
 					require_once( plugin_dir_path( __FILE__ ) . '/../templates/admin/settings.php' );
 					break;
 				//case 'subresource_settings':
@@ -175,6 +179,7 @@ class Form_Processor_MailChimp_Admin {
 		if ( '' !== $mailchimp_api ) {
 			$this->allowed_resources( 'allowed_resources', 'allowed_resources', $all_field_callbacks );
 			$this->resource_settings( 'resource_settings', 'resource_settings', $all_field_callbacks );
+			$this->loaded_resources( 'loaded_resources', 'loaded_resources', $all_field_callbacks );
 			//$this->subresource_settings( 'subresource_settings', 'subresource_settings', $all_field_callbacks );
 		}
 
@@ -354,37 +359,38 @@ class Form_Processor_MailChimp_Admin {
 	}
 
 	/**
-	* Fields for the MailChimp Subresources tab
+	* Fields for the Loaded Resources tab
 	* This runs add_settings_section once, as well as add_settings_field and register_setting methods for each option
 	*
 	* @param string $page
 	* @param string $section
 	* @param string $input_callback
 	*/
-	private function subresource_settings( $page, $section, $callbacks ) {
+	private function loaded_resources( $page, $section, $callbacks ) {
 
-		$subresources = get_option( $this->option_prefix . 'subresources', '' );
+		$resources = get_option( $this->option_prefix . 'resources', '' );
 
-		if ( '' !== $subresources ) {
-
-			foreach ( $subresources as $subresource ) {
-				$section = $section . '_' . $subresource;
-				add_settings_section( $section, ucwords( $subresource ), null, $page );
-				$settings = array(
-					'methods' => array(
-						'title' => __( 'Allowed Methods', 'form-processor-mailchimp' ),
+		if ( '' !== $resources ) {
+			$settings = array();
+			foreach ( $resources as $resource ) {
+				$section = $section . '_' . $resource;
+				add_settings_section( $section, ucwords( $resource ), null, $page );
+				$loaded_resources = array(
+					'loaded_resources' => array(
+						'title' => __( 'Loaded Items', 'form-processor-mailchimp' ),
 						'callback' => $callbacks['checkboxes'],
 						'page' => $page,
 						'section' => $section,
 						'args' => array(
-							'resource' => $subresource,
+							'resource' => $resource,
+							'subresource' => '',
 							'type' => 'select',
 							'desc' => '',
-							'items' => $this->get_mailchimp_method_options( $list, $subresource ),
+							'items' => $this->get_mailchimp_load_resource_items( $resource ),
 						),
 					),
 				);
-				foreach ( $settings as $key => $attributes ) {
+				foreach ( $loaded_resources as $key => $attributes ) {
 					$id = $this->option_prefix . $key;
 					$name = $this->option_prefix . $key;
 					$title = $attributes['title'];
@@ -402,6 +408,68 @@ class Form_Processor_MailChimp_Admin {
 					);
 					add_settings_field( $id, $title, $callback, $page, $section, $args );
 					register_setting( $page, $id );
+				}
+			}
+			$settings[ $resource ] = $loaded_resources;
+		}
+
+	}
+
+	/**
+	* Fields for the MailChimp Subresources tab
+	* This runs add_settings_section once, as well as add_settings_field and register_setting methods for each option
+	*
+	* @param string $page
+	* @param string $section
+	* @param string $input_callback
+	*/
+	private function subresource_settings( $page, $section, $callbacks ) {
+		$resources = get_option( $this->option_prefix . 'resources', '' );
+
+		if ( '' !== $resources ) {
+
+			foreach ( $resources as $resource ) {
+
+				$subresources = get_option( $this->option_prefix . 'subresources', '' )[ $resource ];
+				if ( '' !== $subresources ) {
+
+					foreach ( $subresources as $subresource ) {
+						$section = $section . '_' . $subresource;
+						add_settings_section( $section, ucwords( $resource ) . ' - ' . ucwords( str_replace( '-', ' ', $subresource ) ), null, $page );
+						$settings = array(
+							'methods' => array(
+								'title' => __( 'Allowed Methods', 'form-processor-mailchimp' ),
+								'callback' => $callbacks['checkboxes'],
+								'page' => $page,
+								'section' => $section,
+								'args' => array(
+									'resource' => $subresource,
+									'type' => 'select',
+									'desc' => '',
+									'items' => $this->get_mailchimp_method_options( $resource, $subresource ),
+								),
+							),
+						);
+						foreach ( $settings as $key => $attributes ) {
+							$id = $this->option_prefix . $key;
+							$name = $this->option_prefix . $key;
+							$title = $attributes['title'];
+							$callback = $attributes['callback'];
+							$page = $attributes['page'];
+							$section = $attributes['section'];
+							$args = array_merge(
+								$attributes['args'],
+								array(
+									'title' => $title,
+									'id' => $id,
+									'label_for' => $id,
+									'name' => $name,
+								)
+							);
+							add_settings_field( $id, $title, $callback, $page, $section, $args );
+							register_setting( $page, $id );
+						}
+					}
 				}
 			}
 		}
@@ -450,9 +518,33 @@ class Form_Processor_MailChimp_Admin {
 				'subresource' => $subresource,
 				'text' => $method,
 				'id' => strtolower( $method ),
+				'value' => $method,
 				'desc' => '',
 				'default' => '',
 			);
+		}
+		return $options;
+	}
+
+	private function get_mailchimp_load_resource_items( $resource = '' ) {
+		$options = array();
+		if ( '' !== $resource ) {
+			$resources = $this->mailchimp->load( $resource );
+			foreach ( $resources[ $resource ] as $item ) {
+				if ( isset( $item['name'] ) ) {
+					$text = $item['name'];
+				} else {
+					if ( 'campaigns' === $resource ) {
+						$text = $item['settings']['title'];
+					}
+				}
+				$options[ $item['id'] ] = array(
+					'text' => $text,
+					'id' => $item['id'],
+					'desc' => '',
+					'default' => '',
+				);
+			}
 		}
 		return $options;
 	}
@@ -548,8 +640,13 @@ class Form_Processor_MailChimp_Admin {
 			$text = $value['text'];
 			$id = $value['id'];
 			$desc = $value['desc'];
+			if ( isset( $value['value'] ) ) {
+				$item_value = $value['value'];
+			} else {
+				$item_value = $key;
+			}
 			$checked = '';
-			if ( is_array( $options ) && in_array( (string) $key, $options, true ) ) {
+			if ( is_array( $options ) && in_array( (string) $item_value, $options, true ) ) {
 				$checked = 'checked';
 			} elseif ( is_array( $options ) && empty( $options ) ) {
 				if ( isset( $value['default'] ) && true === $value['default'] ) {
@@ -570,7 +667,7 @@ class Form_Processor_MailChimp_Admin {
 
 			echo sprintf( '<div class="checkbox"><label><input type="%1$s" value="%2$s" name="%3$s[]" id="%4$s"%5$s>%6$s</label></div>',
 				esc_attr( $type ),
-				esc_attr( $key ),
+				esc_attr( $item_value ),
 				esc_attr( $input_name ),
 				esc_attr( $id ),
 				esc_html( $checked ),
