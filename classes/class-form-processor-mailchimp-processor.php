@@ -52,12 +52,13 @@ class Form_Processor_MailChimp_Processor {
 		$namespace = $this->namespace . $this->api_version;
 		$resources = get_option( $this->option_prefix . 'resources', '' );
 		$subresources = get_option( $this->option_prefix . 'subresources', '' );
-		$methods = get_option( $this->option_prefix . 'methods', '' );
+		$resource_methods = get_option( $this->option_prefix . 'resource_methods', '' );
+		$subresource_methods = get_option( $this->option_prefix . 'subresource_methods', '' );
 
 		if ( '' !== $resources && is_array( $resources ) ) {
 			foreach ( $resources as $key => $resource ) {
 				$subresource_list = $subresources[ $resource ];
-				$method_list = $methods[ $resource ];
+				$method_list = $resource_methods[ $resource ];
 				register_rest_route( $namespace, '/' . $resource, array(
 					array(
 						'methods' => $method_list,
@@ -79,7 +80,7 @@ class Form_Processor_MailChimp_Processor {
 				) );
 				if ( '' !== $subresource_list && is_array( $subresource_list ) ) {
 					foreach ( $subresource_list as $key => $subresource ) {
-						$method_list = $methods[ $resource ];
+						$method_list = $subresource_methods[ $resource ][ $subresource ];
 						register_rest_route( $namespace, '/' . $resource . '/(?P<resource_id>\w+)/' . $subresource, array(
 							array(
 								'methods' => $method_list,
@@ -126,11 +127,14 @@ class Form_Processor_MailChimp_Processor {
 		//error_log( 'request is ' . print_r( $request, true ) );
 		$method = $request->get_method();
 		$route = $request->get_route();
-		$params = $request->get_url_params();
-		//error_log( 'route is ' . $route . ' and params are ' . print_r( $params, true ) );
+		$url_params = $request->get_url_params();
+		$body_params = $request->get_body_params();
+		$api_call = str_replace( '/' . $this->namespace . $this->api_version . '/', '', $route );
+		//error_log( 'api call is ' . $api_call . ' and params are ' . print_r( $params, true ) );
 		switch ( $method ) {
 			case 'GET':
-				return 'get';
+				$result = $this->mailchimp->load( $api_call );
+				return $result;
 				break;
 			case 'POST':
 				return 'create new';

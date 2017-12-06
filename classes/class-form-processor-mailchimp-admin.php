@@ -35,6 +35,12 @@ class Form_Processor_MailChimp_Admin {
 		$this->wordpress = $wordpress;
 		$this->mailchimp = $mailchimp;
 
+		// the plugin doesn't support everything in the api, so let's not pretend it does
+		// ideally it should eventually go away though
+		$this->supported_resources = array(
+			'lists',
+		);
+
 		$this->mc_form_transients = $this->wordpress->mc_form_transients;
 
 		$this->tabs = $this->get_admin_tabs();
@@ -70,8 +76,8 @@ class Form_Processor_MailChimp_Admin {
 			'mc_settings' => 'MailChimp Settings',
 			'allowed_resources' => 'Allowed Resources',
 			'resource_settings' => 'Resource Settings',
-			'loaded_resources' => 'Loaded Resources',
-			//'subresource_settings' => 'Subresource Settings',
+			//'loaded_resources' => 'Loaded Resources',
+			'subresource_settings' => 'Subresource Settings',
 			//'schedule' => 'Scheduling',
 		); // this creates the tabs for the admin
 		return $tabs;
@@ -103,12 +109,12 @@ class Form_Processor_MailChimp_Admin {
 				case 'resource_settings':
 					require_once( plugin_dir_path( __FILE__ ) . '/../templates/admin/settings.php' );
 					break;
-				case 'loaded_resources':
-					require_once( plugin_dir_path( __FILE__ ) . '/../templates/admin/settings.php' );
-					break;
-				//case 'subresource_settings':
+				//case 'loaded_resources':
 				//	require_once( plugin_dir_path( __FILE__ ) . '/../templates/admin/settings.php' );
 				//	break;
+				case 'subresource_settings':
+					require_once( plugin_dir_path( __FILE__ ) . '/../templates/admin/settings.php' );
+					break;
 				default:
 					require_once( plugin_dir_path( __FILE__ ) . '/../templates/admin/settings.php' );
 					break;
@@ -179,8 +185,8 @@ class Form_Processor_MailChimp_Admin {
 		if ( '' !== $mailchimp_api ) {
 			$this->allowed_resources( 'allowed_resources', 'allowed_resources', $all_field_callbacks );
 			$this->resource_settings( 'resource_settings', 'resource_settings', $all_field_callbacks );
-			$this->loaded_resources( 'loaded_resources', 'loaded_resources', $all_field_callbacks );
-			//$this->subresource_settings( 'subresource_settings', 'subresource_settings', $all_field_callbacks );
+			//$this->loaded_resources( 'loaded_resources', 'loaded_resources', $all_field_callbacks );
+			$this->subresource_settings( 'subresource_settings', 'subresource_settings', $all_field_callbacks );
 		}
 
 	}
@@ -262,7 +268,7 @@ class Form_Processor_MailChimp_Admin {
 				'section' => $section,
 				'args' => array(
 					'type' => 'select',
-					'desc' => '',
+					'desc' => 'As this plugin supports more MailChimp object types, there will be more choices.',
 					'items' => $this->get_mailchimp_resources_options(),
 				),
 			),
@@ -307,7 +313,7 @@ class Form_Processor_MailChimp_Admin {
 				$section = $section . '_' . $resource;
 				add_settings_section( $section, ucwords( $resource ), null, $page );
 				$resource_settings = array(
-					'methods' => array(
+					'resource_methods' => array(
 						'title' => __( 'Allowed Methods', 'form-processor-mailchimp' ),
 						'callback' => $callbacks['checkboxes'],
 						'page' => $page,
@@ -437,13 +443,14 @@ class Form_Processor_MailChimp_Admin {
 						$section = $section . '_' . $subresource;
 						add_settings_section( $section, ucwords( $resource ) . ' - ' . ucwords( str_replace( '-', ' ', $subresource ) ), null, $page );
 						$settings = array(
-							'methods' => array(
+							'subresource_methods' => array(
 								'title' => __( 'Allowed Methods', 'form-processor-mailchimp' ),
 								'callback' => $callbacks['checkboxes'],
 								'page' => $page,
 								'section' => $section,
 								'args' => array(
-									'resource' => $subresource,
+									'resource' => $resource,
+									'subresource' => $subresource,
 									'type' => 'select',
 									'desc' => '',
 									'items' => $this->get_mailchimp_method_options( $resource, $subresource ),
@@ -480,9 +487,10 @@ class Form_Processor_MailChimp_Admin {
 		$resources = $this->mailchimp->load( '' );
 		$options = array();
 		foreach ( $resources['_links'] as $link ) {
-			if ( 'self' !== $link['rel'] ) {
+			// this is where we check for supported resources. again, ideally this would go away one day.
+			if ( 'self' !== $link['rel'] && in_array( $link['rel'], $this->supported_resources ) ) {
 				$options[ $link['rel'] ] = array(
-					'text' => ucwords( $link['rel'] ),
+					'text' => ucwords( str_replace( '-', ' ', $link['rel'] ) ),
 					'id' => $link['rel'],
 					'desc' => '',
 					'default' => '',
@@ -499,7 +507,7 @@ class Form_Processor_MailChimp_Admin {
 			if ( ! in_array( $link['rel'], array( 'self', 'parent', 'update', 'delete' ) ) ) {
 				$options[ $link['rel'] ] = array(
 					'resource' => $resource,
-					'text' => ucwords( $link['rel'] ),
+					'text' => ucwords( str_replace( '-', ' ', $link['rel'] ) ),
 					'id' => $link['rel'],
 					'desc' => '',
 					'default' => '',
@@ -627,12 +635,14 @@ class Form_Processor_MailChimp_Admin {
 		$type = 'checkbox';
 
 		$name = $args['name'];
+		$group_desc = $args['desc'];
 		$options = get_option( $name, array() );
 
 		if ( isset( $options[ $resource ] ) && is_array( $options[ $resource ] ) ) {
-			$options = $options[ $resource ];
 			if ( isset( $options[ $resource ][ $subresource ] ) && is_array( $options[ $resource ][ $subresource ] ) ) {
 				$options = $options[ $resource ][ $subresource ];
+			} else {
+				$options = $options[ $resource ];
 			}
 		}
 
@@ -678,6 +688,12 @@ class Form_Processor_MailChimp_Admin {
 					esc_html( $desc )
 				);
 			}
+		}
+
+		if ( '' !== $group_desc ) {
+			echo sprintf( '<p class="description">%1$s</p>',
+				esc_html( $group_desc )
+			);
 		}
 
 	}
