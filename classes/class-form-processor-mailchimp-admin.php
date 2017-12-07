@@ -338,6 +338,18 @@ class Form_Processor_MailChimp_Admin {
 							'items' => $this->get_mailchimp_subresources_options( $resource ),
 						),
 					),
+					/*'resource_fields' => array(
+						'title' => __( 'Allowed Fields', 'form-processor-mailchimp' ),
+						'callback' => $callbacks['checkboxes'],
+						'page' => $page,
+						'section' => $section,
+						'args' => array(
+							'resource' => $resource,
+							'type' => 'select',
+							'desc' => '',
+							'items' => $this->get_mailchimp_field_options( $resource ),
+						),
+					),*/
 				);
 				foreach ( $resource_settings as $key => $attributes ) {
 					$id = $this->option_prefix . $key;
@@ -456,6 +468,19 @@ class Form_Processor_MailChimp_Admin {
 									'items' => $this->get_mailchimp_method_options( $resource, $subresource ),
 								),
 							),
+							/*'subresource_fields' => array(
+								'title' => __( 'Allowed Fields', 'form-processor-mailchimp' ),
+								'callback' => $callbacks['checkboxes'],
+								'page' => $page,
+								'section' => $section,
+								'args' => array(
+									'resource' => $resource,
+									'subresource' => $subresource,
+									'type' => 'select',
+									'desc' => '',
+									'items' => $this->get_mailchimp_field_options( $resource, $subresource ),
+								),
+							),*/
 						);
 						foreach ( $settings as $key => $attributes ) {
 							$id = $this->option_prefix . $key;
@@ -532,6 +557,55 @@ class Form_Processor_MailChimp_Admin {
 			);
 		}
 		return $options;
+	}
+
+	private function get_mailchimp_field_options( $resource_name = '', $subresource_name = '' ) {
+		$options = array();
+		$resource = $this->mailchimp->load( $resource_name );
+		//error_log( 'resource is ' . print_r( $resource, true ) );
+		if ( '' === $subresource_name ) {
+			foreach ( $resource['_links'] as $link ) {
+				if ( 'create' === $link['rel'] ) {
+					$url = $link['schema'];
+					continue;
+				}
+			}
+		} else {
+			$loaded_resources = get_option( $this->option_prefix . 'loaded_resources', '' );
+			foreach ( $loaded_resources as $loaded_resource ) {
+				$id = $loaded_resource[0];
+				//error_log( 'api url is ' . $resource . '/' . $id . '/' . $subresource_name );
+				$subresource = $this->mailchimp->load( $resource_name . '/' . $id . '/' . $subresource_name );
+				//error_log( 'sub is ' . print_r( $subresource, true ) );
+				foreach ( $subresource['_links'] as $link ) {
+					if ( 'create' === $link['rel'] ) {
+						//error_log('link is ' . print_r($link, true ));
+						$url = $link['schema'];
+						continue;
+					}
+				}
+			}
+		}
+
+		$request = wp_remote_get( $url );
+		if ( is_wp_error( $request ) ) {
+			return $options;
+		}
+
+		$body = wp_remote_retrieve_body( $request );
+		$data = json_decode( $body, true );
+		if ( ! empty( $data ) ) {
+			//error_log( 'data is ' . print_r( $data, true ) );
+			foreach ( $data['properties'] as $property ) {
+				error_log( 'property is ' . print_r( $property, true ) );
+			}
+		}
+
+		return $options;
+
+		//error_log( 'url is ' . $url );
+
+		
 	}
 
 	private function get_mailchimp_load_resource_items( $resource = '' ) {

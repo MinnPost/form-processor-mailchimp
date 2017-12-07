@@ -137,13 +137,18 @@ class Form_Processor_MailChimp_Processor {
 				return $result;
 				break;
 			case 'POST':
-				return 'create new';
+				$result = $this->mailchimp->send( $api_call, $method, $body_params );
+				return $result;
 				break;
 			case 'PATCH':
 				return 'edit existing';
+				$result = $this->mailchimp->send( $api_call, $method, $body_params );
+				return $result;
 				break;
 			case 'DELETE':
 				return 'delete existing';
+				$result = $this->mailchimp->remove();
+				return $result;
 				break;
 			default:
 				return;
