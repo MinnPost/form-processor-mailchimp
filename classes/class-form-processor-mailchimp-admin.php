@@ -543,7 +543,7 @@ class Form_Processor_MailChimp_Admin {
 	}
 
 	private function get_mailchimp_method_options( $resource = '', $subresource = '' ) {
-		$methods = array( 'GET', 'POST', 'PATCH', 'DELETE' );
+		$methods = array( 'GET', 'POST', 'PATCH', 'PUT', 'DELETE' );
 		$options = array();
 		foreach ( $methods as $method ) {
 			$options[ strtolower( $method ) ] = array(
