@@ -61,9 +61,12 @@ class Form_Processor_MailChimp_MCWrapper {
 		}
 	}
 
-	public function send( $call = '', $method = 'post', $params = array() ) {
+	public function send( $call = '', $method = 'POST', $params = array() ) {
 		$result = '';
-
+		// this is not flexible enough for broad use, but it does work for the member update
+		if ( 'PUT' === $method && isset( $params['email_address'] ) ) {
+			$call = $call . '/' . md5( $params['email_address'] );
+		}
 		foreach ( $params as $key => $value ) {
 			if ( is_array( $value ) || is_object( $value ) ) {
 				foreach ( $value as $subkey => $subvalue ) {

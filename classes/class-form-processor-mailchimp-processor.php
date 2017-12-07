@@ -146,7 +146,6 @@ class Form_Processor_MailChimp_Processor {
 				return $result;
 				break;
 			case 'PUT':
-				return 'add or update';
 				$result = $this->mailchimp->send( $api_call, $method, $body_params );
 				return $result;
 				break;
