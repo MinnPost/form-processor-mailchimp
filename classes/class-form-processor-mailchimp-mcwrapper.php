@@ -65,21 +65,25 @@ class Form_Processor_MailChimp_MCWrapper {
 		$result = '';
 
 		foreach ( $params as $key => $value ) {
-			if ( is_array( $value ) ) {
+			if ( is_array( $value ) || is_object( $value ) ) {
 				foreach ( $value as $subkey => $subvalue ) {
-					if ( 'true' === $subvalue ) {
-						$value[ $subkey ] = true; // try to force a boolean in case it is a string
-					} elseif ( 'false' === $subvalue ) {
-						$value[ $subkey ] = false; // try to force a boolean in case it is a string
-					} else {
-						$value[ $subkey ] = sanitize_text_field( $subvalue );
+					if ( 'true' === $subvalue || 'false' === $subvalue ) {
+						$subvalue = (bool) $subvalue; // try to force a boolean in case it is a string
 					}
+					$type = gettype( $subvalue );
+					$value[ $subkey ] = strip_tags( stripslashes( $subvalue ) );
 				}
 				$params[ $key ] = (object) $value;
 			} else {
-				$params[ $key ] = sanitize_text_field( $value );
+				if ( 'true' === $value || 'false' === $value ) {
+					$value = (bool) $value; // try to force a boolean in case it is a string
+				}
+				$type = gettype( $value );
+				$params[ $key ] = strip_tags( stripslashes( $value ) );
 			}
 		}
+
+		error_log( print_r( $params, true ) );
 
 		$result = $this->mailchimp_api->{ $method }( $call, $params );
 		return $result;
