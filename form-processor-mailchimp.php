@@ -13,6 +13,76 @@ License URI: https://www.gnu.org/licenses/gpl-2.0.html
 class Form_Processor_MailChimp {
 
 	/**
+	* @var string
+	* The plugin version
+	*/
+	private $version;
+
+	/**
+	* @var string
+	* The REST API namespace
+	*/
+	private $namespace;
+
+	/**
+	* @var int
+	* The REST API version
+	*/
+	private $api_version;
+
+	/**
+	* @var string
+	* The plugin's prefix for saving options
+	*/
+	private $option_prefix;
+
+	/**
+	* @var object
+	* Load and initialize the Form_Processor_MailChimp_WPWrapper class
+	*/
+	private $wordpress;
+
+	/**
+	* @var object
+	* Load and initialize the Form_Processor_MailChimp_MCWrapper class
+	*/
+	private $mailchimp;
+
+	/**
+	* @var object
+	* Load and initialize the Form_Processor_MailChimp_Processor class
+	*/
+	private $processor;
+
+	/**
+	* @var object
+	* Load and initialize the Form_Processor_MailChimp_Admin class
+	*/
+	private $admin;
+
+	/**
+	 * @var object
+	 * Static property to hold an instance of the class; this seems to make it reusable
+	 *
+	 */
+	static $instance = null;
+
+	/**
+	* Load the static $instance property that holds the instance of the class.
+	* This instance makes the class reusable by other plugins
+	*
+	* @return object
+	*   The sfapi object if it is authenticated (empty, otherwise)
+	*
+	*/
+	static public function get_instance() {
+		if ( null === self::$instance ) {
+			self::$instance = new Form_Processor_MailChimp();
+		}
+		return self::$instance;
+	}
+
+	/**
 	 * This is our constructor
 	 *
 	 * @return void
@@ -85,4 +155,5 @@ class Form_Processor_MailChimp {
 }
 
 // Instantiate our class
-$form_processor_mailchimp = new Form_Processor_MailChimp();
+$form_processor_mailchimp = Form_Processor_MailChimp::get_instance();
+
