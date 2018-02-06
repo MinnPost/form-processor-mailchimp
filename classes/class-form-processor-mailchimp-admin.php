@@ -71,6 +71,10 @@ class Form_Processor_MailChimp_Admin {
 		add_options_page( $title, $title, 'manage_options', 'form-processor-mailchimp', array( $this, 'show_admin_page' ) );
 	}
 
+	/**
+	* Create WordPress admin options page tabs
+	*
+	*/
 	private function get_admin_tabs() {
 		$tabs = array(
 			'mc_settings' => 'MailChimp Settings',
@@ -604,8 +608,6 @@ class Form_Processor_MailChimp_Admin {
 		return $options;
 
 		//error_log( 'url is ' . $url );
-
-		
 	}
 
 	private function get_mailchimp_load_resource_items( $resource = '' ) {

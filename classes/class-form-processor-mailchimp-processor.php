@@ -43,11 +43,21 @@ class Form_Processor_MailChimp_Processor {
 		$this->init();
 	}
 
+	/**
+	* Initialize REST API routes
+	*
+	* @throws \Exception
+	*/
 	private function init() {
 		add_action( 'rest_api_init', array( $this, 'register_routes' ) );
 	}
 
 
+	/**
+	* Register REST API routes for the configured MailChimp objects
+	*
+	* @throws \Exception
+	*/
 	public function register_routes() {
 		$namespace = $this->namespace . $this->api_version;
 		$resources = get_option( $this->option_prefix . 'resources', '' );
@@ -114,6 +124,11 @@ class Form_Processor_MailChimp_Processor {
 		}
 	}
 
+	/**
+	* Check to see if the user has permission to do this
+	*
+	* @throws \Exception
+	*/
 	public function can_process( WP_REST_Request $request ) {
 		// Note: any route/method combo is only created if the plugin options warrant it. We don't have to validate that here.
 		/*if ( ! current_user_can( 'submit_mc_form' ) ) {
@@ -122,6 +137,11 @@ class Form_Processor_MailChimp_Processor {
 		return true;
 	}
 
+	/**
+	* Process the REST API request
+	*
+	* @return $result
+	*/
 	public function process( WP_REST_Request $request ) {
 		// see methods: https://developer.wordpress.org/reference/classes/wp_rest_request/
 		//error_log( 'request is ' . print_r( $request, true ) );

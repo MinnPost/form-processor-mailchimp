@@ -100,7 +100,7 @@ class Form_Processor_MailChimp {
 		// WordPress wrapper
 		$this->wordpress = $this->wordpress();
 
-		// mailchimp wrapper
+		// MailChimp wrapper
 		$this->mailchimp = $this->mailchimp();
 
 		// form processor
@@ -111,24 +111,44 @@ class Form_Processor_MailChimp {
 
 	}
 
+	/**
+	 * WordPress wrapper. Includes caching.
+	 *
+	 * @return object $wordpress
+	 */
 	private function wordpress() {
 		require_once( plugin_dir_path( __FILE__ ) . 'classes/class-form-processor-mailchimp-wpwrapper.php' );
 		$wordpress = new Form_Processor_MailChimp_WPWrapper( $this->option_prefix, $this->version );
 		return $wordpress;
 	}
 
+	/**
+	 * MailChimp API wrapper
+	 *
+	 * @return object $mailchimp
+	 */
 	private function mailchimp() {
 		require_once( plugin_dir_path( __FILE__ ) . 'classes/class-form-processor-mailchimp-mcwrapper.php' );
 		$mailchimp = new Form_Processor_MailChimp_MCWrapper( $this->option_prefix, $this->version, $this->wordpress );
 		return $mailchimp;
 	}
 
+	/**
+	 * REST API processor. Handles API requests.
+	 *
+	 * @return object $processor
+	 */
 	private function processor() {
 		require_once( plugin_dir_path( __FILE__ ) . 'classes/class-form-processor-mailchimp-processor.php' );
 		$processor = new Form_Processor_MailChimp_Processor( $this->option_prefix, $this->version, $this->namespace, $this->api_version, $this->wordpress, $this->mailchimp );
 		return $processor;
 	}
 
+	/**
+	 * Plugin admin
+	 *
+	 * @return object $admin
+	 */
 	private function load_admin() {
 		require_once( plugin_dir_path( __FILE__ ) . 'classes/class-form-processor-mailchimp-admin.php' );
 		$admin = new Form_Processor_MailChimp_Admin( $this->option_prefix, $this->version, $this->wordpress, $this->mailchimp );

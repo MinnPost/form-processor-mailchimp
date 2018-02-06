@@ -10,7 +10,7 @@ if ( ! class_exists( 'Form_Processor_MailChimp' ) ) {
 }
 
 /**
- * Create default WordPress admin functionality to configure the plugin.
+ * Create default WordPress functionality to configure the plugin.
  */
 class Form_Processor_MailChimp_WPWrapper {
 
