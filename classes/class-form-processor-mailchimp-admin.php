@@ -223,6 +223,17 @@ class Form_Processor_MailChimp_Admin {
 					'desc' => '',
 				),
 			),
+			'http_methods' => array(
+				'title' => __( 'Allowed HTTP Methods', 'form-processor-mailchimp' ),
+				'callback' => $callbacks['checkboxes'],
+				'page' => $page,
+				'section' => $section,
+				'args' => array(
+					'type' => 'select',
+					'desc' => '',
+					'items' => $this->get_mailchimp_http_method_options(),
+				),
+			),
 		);
 
 		foreach ( $settings as $key => $attributes ) {
@@ -265,18 +276,35 @@ class Form_Processor_MailChimp_Admin {
 		add_settings_section( $page, $title, null, $page );
 
 		$settings = array(
-			'resources' => array(
-				'title' => __( 'Allowed Resources', 'form-processor-mailchimp' ),
+			'resource_types' => array(
+				'title' => __( 'Allowed Resource Types', 'form-processor-mailchimp' ),
 				'callback' => $callbacks['checkboxes'],
 				'page' => $page,
 				'section' => $section,
 				'args' => array(
 					'type' => 'select',
 					'desc' => 'As this plugin supports more MailChimp object types, there will be more choices.',
-					'items' => $this->get_mailchimp_resources_options(),
+					'items' => $this->get_mailchimp_resource_types_options(),
 				),
 			),
 		);
+
+		if ( '' !== get_option( $this->option_prefix . 'resource_types', '' ) ) {
+			foreach ( get_option( $this->option_prefix . 'resource_types', '' ) as $type ) {
+				$settings[ 'resources_' . $type ] = array(
+					'title' => __( 'Allowed Resources - ', 'form-processor-mailchimp' ) . ucfirst( $type ),
+					'callback' => $callbacks['checkboxes'],
+					'page' => $page,
+					'section' => $section,
+					'args' => array(
+						'resource_type' => $type,
+						'type' => 'select',
+						'desc' => '',
+						'items' => $this->get_mailchimp_resources_options( $type ),
+					),
+				);
+			}
+		}
 
 		foreach ( $settings as $key => $attributes ) {
 			$id = $this->option_prefix . $key;
@@ -309,52 +337,61 @@ class Form_Processor_MailChimp_Admin {
 	*/
 	private function resource_settings( $page, $section, $callbacks ) {
 
-		$resources = get_option( $this->option_prefix . 'resources', '' );
+		$resource_types = get_option( $this->option_prefix . 'resource_types', '' );
 
-		if ( '' !== $resources ) {
+		if ( '' !== $resource_types ) {
 			$settings = array();
-			foreach ( $resources as $resource ) {
-				$section = $section . '_' . $resource;
-				add_settings_section( $section, ucwords( $resource ), null, $page );
+			foreach ( $resource_types as $resource_type ) {
+				$section = $section . '_' . $resource_type;
+				add_settings_section( $section, ucwords( $resource_type ), null, $page );
 				$resource_settings = array(
-					'resource_methods' => array(
-						'title' => __( 'Allowed Methods', 'form-processor-mailchimp' ),
+					'subresource_types_' . $resource_type => array(
+						'title' => __( 'Allowed Subresource Types', 'form-processor-mailchimp' ),
 						'callback' => $callbacks['checkboxes'],
 						'page' => $page,
 						'section' => $section,
 						'args' => array(
-							'resource' => $resource,
-							'subresource' => '',
+							'resource_type' => $resource_type,
 							'type' => 'select',
 							'desc' => '',
-							'items' => $this->get_mailchimp_method_options( $resource ),
+							'items' => $this->get_mailchimp_subresource_type_options( $resource_type ),
 						),
 					),
-					'subresources' => array(
-						'title' => __( 'Allowed Subresources', 'form-processor-mailchimp' ),
-						'callback' => $callbacks['checkboxes'],
-						'page' => $page,
-						'section' => $section,
-						'args' => array(
-							'resource' => $resource,
-							'type' => 'select',
-							'desc' => '',
-							'items' => $this->get_mailchimp_subresources_options( $resource ),
-						),
-					),
-					/*'resource_fields' => array(
-						'title' => __( 'Allowed Fields', 'form-processor-mailchimp' ),
-						'callback' => $callbacks['checkboxes'],
-						'page' => $page,
-						'section' => $section,
-						'args' => array(
-							'resource' => $resource,
-							'type' => 'select',
-							'desc' => '',
-							'items' => $this->get_mailchimp_field_options( $resource ),
-						),
-					),*/
 				);
+
+				if ( '' !== get_option( $this->option_prefix . 'subresource_types_' . $resource_type, '' ) ) {
+
+					$resources = get_option( $this->option_prefix . 'resources', '' )[ $resource_type ];
+					if ( '' !== $resources ) {
+
+						foreach ( $resources as $resource ) {
+
+							$resource_name = $this->mailchimp->get_name( $resource_type, $resource );
+
+							foreach ( get_option( $this->option_prefix . 'subresource_types', '' )[ $resource_type ] as $subresource_type ) {
+
+								$options = $this->get_mailchimp_subresource_options( $resource_type, $resource, $subresource_type );
+								if ( ! empty( $options ) ) {
+									$resource_settings[ 'subresources_' . $resource . '_' . $subresource_type ] = array(
+										'title' => __( 'Allowed ' . ucwords( str_replace( '-', ' ', $subresource_type ) ) . ' - ', 'form-processor-mailchimp' ) . ucfirst( $resource_name ),
+										'callback' => $callbacks['checkboxes'],
+										'page' => $page,
+										'section' => $section,
+										'args' => array(
+											'resource_type' => $resource_type,
+											'resource' => $resource,
+											'subresource_type' => $subresource_type,
+											'type' => 'select',
+											'desc' => '',
+											'items' => $this->get_mailchimp_subresource_options( $resource_type, $resource, $subresource_type ),
+										),
+									);
+								}
+							}
+						}
+					}
+				}
+
 				foreach ( $resource_settings as $key => $attributes ) {
 					$id = $this->option_prefix . $key;
 					$name = $this->option_prefix . $key;
@@ -375,7 +412,7 @@ class Form_Processor_MailChimp_Admin {
 					register_setting( $page, $id );
 				}
 			}
-			$settings[ $resource ] = $resource_settings;
+			$settings[ $resource_type ] = $resource_settings;
 		}
 
 	}
@@ -446,64 +483,64 @@ class Form_Processor_MailChimp_Admin {
 	* @param string $input_callback
 	*/
 	private function subresource_settings( $page, $section, $callbacks ) {
-		$resources = get_option( $this->option_prefix . 'resources', '' );
+		$resource_types = get_option( $this->option_prefix . 'resource_types', '' );
+		$subresource_types = get_option( $this->option_prefix . 'subresource_types', '' );
 
-		if ( '' !== $resources ) {
+		if ( '' !== $resource_types ) {
 
-			foreach ( $resources as $resource ) {
+			foreach ( $resource_types as $resource_type ) {
 
-				$subresources = get_option( $this->option_prefix . 'subresources', '' )[ $resource ];
-				if ( '' !== $subresources ) {
+				$resources = get_option( $this->option_prefix . 'resources', '' )[ $resource_type ];
+				if ( '' !== $resources ) {
 
-					foreach ( $subresources as $subresource ) {
-						$section = $section . '_' . $subresource;
-						add_settings_section( $section, ucwords( $resource ) . ' - ' . ucwords( str_replace( '-', ' ', $subresource ) ), null, $page );
-						$settings = array(
-							'subresource_methods' => array(
-								'title' => __( 'Allowed Methods', 'form-processor-mailchimp' ),
-								'callback' => $callbacks['checkboxes'],
-								'page' => $page,
-								'section' => $section,
-								'args' => array(
-									'resource' => $resource,
-									'subresource' => $subresource,
-									'type' => 'select',
-									'desc' => '',
-									'items' => $this->get_mailchimp_method_options( $resource, $subresource ),
-								),
-							),
-							/*'subresource_fields' => array(
-								'title' => __( 'Allowed Fields', 'form-processor-mailchimp' ),
-								'callback' => $callbacks['checkboxes'],
-								'page' => $page,
-								'section' => $section,
-								'args' => array(
-									'resource' => $resource,
-									'subresource' => $subresource,
-									'type' => 'select',
-									'desc' => '',
-									'items' => $this->get_mailchimp_field_options( $resource, $subresource ),
-								),
-							),*/
-						);
-						foreach ( $settings as $key => $attributes ) {
-							$id = $this->option_prefix . $key;
-							$name = $this->option_prefix . $key;
-							$title = $attributes['title'];
-							$callback = $attributes['callback'];
-							$page = $attributes['page'];
-							$section = $attributes['section'];
-							$args = array_merge(
-								$attributes['args'],
-								array(
-									'title' => $title,
-									'id' => $id,
-									'label_for' => $id,
-									'name' => $name,
-								)
-							);
-							add_settings_field( $id, $title, $callback, $page, $section, $args );
-							register_setting( $page, $id );
+					foreach ( $resources as $resource ) {
+
+						$resource_name = $this->mailchimp->get_name( $resource_type, $resource );
+
+						if ( '' !== $subresource_types && isset( $subresource_types[ $resource_type ] ) ) {
+							$subresource_types = $subresource_types[ $resource_type ];
+
+							foreach ( $subresource_types as $subresource ) {
+								$options = $this->get_mailchimp_method_options( $resource_type, $resource, $subresource );
+								if ( ! empty( $options ) ) {
+									$section = $section . '_' . $subresource;
+									add_settings_section( $section, ucwords( $resource_type . ' - ' . $resource_name ) . ' - ' . ucwords( str_replace( '-', ' ', $subresource ) ), null, $page );
+									$settings = array(
+										'subresource_methods' => array(
+											'title' => __( 'Allowed Methods', 'form-processor-mailchimp' ),
+											'callback' => $callbacks['checkboxes'],
+											'page' => $page,
+											'section' => $section,
+											'args' => array(
+												'resource_type' => $resource_type,
+												'subresource' => $subresource,
+												'type' => 'select',
+												'desc' => '',
+												'items' => $this->get_mailchimp_method_options( $resource_type, $resource, $subresource ),
+											),
+										),
+									);
+									foreach ( $settings as $key => $attributes ) {
+										$id = $this->option_prefix . $key;
+										$name = $this->option_prefix . $key;
+										$title = $attributes['title'];
+										$callback = $attributes['callback'];
+										$page = $attributes['page'];
+										$section = $attributes['section'];
+										$args = array_merge(
+											$attributes['args'],
+											array(
+												'title' => $title,
+												'id' => $id,
+												'label_for' => $id,
+												'name' => $name,
+											)
+										);
+										add_settings_field( $id, $title, $callback, $page, $section, $args );
+										register_setting( $page, $id );
+									}
+								}
+							}
 						}
 					}
 				}
@@ -512,7 +549,13 @@ class Form_Processor_MailChimp_Admin {
 
 	}
 
-	private function get_mailchimp_resources_options() {
+	/**
+	* Generate an array of checkboxes for MailChimp resource types
+	*
+	* @return array $options
+	*
+	*/
+	private function get_mailchimp_resource_types_options() {
 		$resources = $this->mailchimp->load( '' );
 		$options = array();
 		foreach ( $resources['_links'] as $link ) {
@@ -529,13 +572,40 @@ class Form_Processor_MailChimp_Admin {
 		return $options;
 	}
 
-	private function get_mailchimp_subresources_options( $resource = '' ) {
-		$subresources = $this->mailchimp->load( $resource );
+	/**
+	* Generate an array of checkboxes for MailChimp resources
+	*
+	* @return array $options
+	*
+	*/
+	private function get_mailchimp_resources_options( $resource_type ) {
+		$resources = $this->mailchimp->load( $resource_type );
 		$options = array();
-		foreach ( $subresources[ $resource ][0]['_links'] as $link ) {
+		foreach ( $resources[ $resource_type ] as $resource ) {
+			$options[ $resource['id'] ] = array(
+				'resource_type' => $resource_type,
+				'text' => $resource['name'],
+				'id' => $resource['id'],
+				'desc' => '',
+				'default' => '',
+			);
+		}
+		return $options;
+	}
+
+	/**
+	* Generate an array of checkboxes for MailChimp subresource types
+	*
+	* @return array $options
+	*
+	*/
+	private function get_mailchimp_subresource_type_options( $resource_type = '' ) {
+		$subresource_types = $this->mailchimp->load( $resource_type );
+		$options = array();
+		foreach ( $subresource_types[ $resource_type ][0]['_links'] as $link ) {
 			if ( ! in_array( $link['rel'], array( 'self', 'parent', 'update', 'delete' ) ) ) {
 				$options[ $link['rel'] ] = array(
-					'resource' => $resource,
+					'resource_type' => $resource_type,
 					'text' => ucwords( str_replace( '-', ' ', $link['rel'] ) ),
 					'id' => $link['rel'],
 					'desc' => '',
@@ -546,13 +616,63 @@ class Form_Processor_MailChimp_Admin {
 		return $options;
 	}
 
-	private function get_mailchimp_method_options( $resource = '', $subresource = '' ) {
+	/**
+	* Generate an array of checkboxes for MailChimp subresources
+	*
+	* @return array $options
+	*
+	*/
+	private function get_mailchimp_subresource_options( $resource_type, $resource_id, $subresource_type ) {
+		//error_log( 'call is ' . $resource_type . '/' . $resource_id . '/' . $subresource_type );
+		$subresources = $this->mailchimp->load( $resource_type . '/' . $resource_id . '/' . $subresource_type );
+		//error_log( 'subresources is ' . print_r( $subresources[ $resource_type ], true ) );
+		$options = array();
+
+		$key = $subresource_type;
+		if ( ! isset( $subresources[ $key ] ) ) {
+			if ( isset( $subresources[ sanitize_title( $subresource_type ) ] ) ) {
+				$key = sanitize_title( $subresource_type );
+			}
+			if ( isset( $subresources[ substr( $subresource_type, strpos( $subresource_type, '-' ) + 1 ) ] ) ) {
+				$key = substr( $subresource_type, strpos( $subresource_type, '-' ) + 1 );
+			}
+			if ( isset( $subresources[ str_replace( '-', '_', $subresource_type ) ] ) ) {
+				$key = str_replace( '-', '_', $subresource_type );
+			}
+		}
+
+		if ( ! isset( $subresources[ $key ] ) || ! isset( $subresources[ $key ][0] ) ) {
+			return $options;
+		}
+
+		foreach ( $subresources[ $key ] as $subresource ) {
+			if ( isset( $subresource['id'] ) && isset( $subresource['title'] ) ) {
+				$options[] = array(
+					'resource_type' => $resource_type,
+					'resource' => $resource_id,
+					'subresource_type' => $subresource_type,
+					'text' => $subresource['title'],
+					'id' => $subresource['id'],
+					'desc' => '',
+					'default' => '',
+				);
+			}
+		}
+
+		return $options;
+	}
+
+	/**
+	* Generate an array of checkboxes for HTTP methods
+	*
+	* @return array $options
+	*
+	*/
+	private function get_mailchimp_http_method_options() {
 		$methods = array( 'GET', 'POST', 'PATCH', 'PUT', 'DELETE' );
 		$options = array();
 		foreach ( $methods as $method ) {
 			$options[ strtolower( $method ) ] = array(
-				'resource' => $resource,
-				'subresource' => $subresource,
 				'text' => $method,
 				'id' => strtolower( $method ),
 				'value' => $method,
@@ -563,6 +683,53 @@ class Form_Processor_MailChimp_Admin {
 		return $options;
 	}
 
+	/**
+	* Generate an array of checkboxes for MailChimp methods on subresource objects
+	*
+	* @return array $options
+	*
+	*/
+	private function get_mailchimp_method_options( $resource_type = '', $resource = '', $subresource = '' ) {
+
+		$methods = $this->mailchimp->load( $resource_type . '/' . $resource . '/' . $subresource );
+		$options = array();
+
+		$key = $subresource;
+		if ( ! isset( $methods[ $key ] ) ) {
+			if ( isset( $methods[ sanitize_title( $subresource ) ] ) ) {
+				$key = sanitize_title( $subresource );
+			}
+			if ( isset( $methods[ substr( $subresource, strpos( $subresource, '-' ) + 1 ) ] ) ) {
+				$key = substr( $subresource, strpos( $subresource, '-' ) + 1 );
+			}
+		}
+		if ( ! isset( $methods[ $key ] ) || ! isset( $methods[ $key ][0] ) ) {
+			return $options;
+		}
+
+		foreach ( $methods[ $key ][0]['_links'] as $link ) {
+			if ( ! in_array( $link['rel'], array( 'self', 'parent', 'create', 'update', 'upsert', 'delete' ) ) ) {
+				$options[ $link['rel'] ] = array(
+					'resource_type' => $resource_type,
+					'resource' => $resource,
+					'subresource' => $subresource,
+					'text' => ucwords( str_replace( '-', ' ', $link['rel'] ) ),
+					'id' => $link['rel'],
+					'desc' => '',
+					'default' => '',
+				);
+			}
+		}
+
+		return $options;
+	}
+
+	/**
+	* Generate an array of checkboxes for MailChimp field options. I can't remember if this is being used.
+	*
+	* @return array $options
+	*
+	*/
 	private function get_mailchimp_field_options( $resource_name = '', $subresource_name = '' ) {
 		$options = array();
 		$resource = $this->mailchimp->load( $resource_name );
@@ -610,6 +777,12 @@ class Form_Processor_MailChimp_Admin {
 		//error_log( 'url is ' . $url );
 	}
 
+	/**
+	* Generate an array of checkboxes for MailChimp resource items
+	*
+	* @return array $options
+	*
+	*/
 	private function get_mailchimp_load_resource_items( $resource = '' ) {
 		$options = array();
 		if ( '' !== $resource ) {
@@ -633,6 +806,12 @@ class Form_Processor_MailChimp_Admin {
 		return $options;
 	}
 
+	/**
+	* Generate an array of checkboxes for MailChimp list options
+	*
+	* @return array $options
+	*
+	*/
 	private function get_mailchimp_lists_options() {
 		$mailchimp_api = $this->mailchimp->mailchimp_api;
 		$lists = $this->mailchimp->load( 'lists' );
@@ -706,19 +885,20 @@ class Form_Processor_MailChimp_Admin {
 	* @param array $args
 	*/
 	public function display_checkboxes( $args ) {
+		$resource_type = isset( $args['resource_type'] ) ? $args['resource_type'] : '';
 		$resource = isset( $args['resource'] ) ? $args['resource'] : '';
-		$subresource = isset( $args['subresource'] ) ? $args['subresource'] : '';
+		$subresource_type = isset( $args['subresource_type'] ) ? $args['subresource_type'] : '';
 		$type = 'checkbox';
 
 		$name = $args['name'];
 		$group_desc = $args['desc'];
 		$options = get_option( $name, array() );
 
-		if ( isset( $options[ $resource ] ) && is_array( $options[ $resource ] ) ) {
-			if ( isset( $options[ $resource ][ $subresource ] ) && is_array( $options[ $resource ][ $subresource ] ) ) {
-				$options = $options[ $resource ][ $subresource ];
+		if ( isset( $options[ $resource_type ] ) && is_array( $options[ $resource_type ] ) ) {
+			if ( isset( $options[ $resource_type ][ $subresource_type ] ) && is_array( $options[ $resource_type ][ $subresource_type ] ) ) {
+				$options = $options[ $resource_type ][ $subresource_type ];
 			} else {
-				$options = $options[ $resource ];
+				$options = $options[ $resource_type ];
 			}
 		}
 
@@ -740,12 +920,12 @@ class Form_Processor_MailChimp_Admin {
 				}
 			}
 
-			if ( '' !== $resource ) {
+			if ( '' !== $resource_type ) {
 				// this generates, for example, form_process_mc_methods[lists][]
-				$input_name = $name . '[' . $resource . ']';
-				if ( '' !== $subresource ) {
+				$input_name = $name . '[' . $resource_type . ']';
+				if ( '' !== $subresource_type ) {
 					// this generates, for example, form_process_mc_methods[lists][members][]
-					$input_name = $name . '[' . $resource . ']' . '[' . $subresource . ']';
+					$input_name = $name . '[' . $resource_type . ']' . '[' . $subresource_type . ']';
 				}
 			} else {
 				$input_name = $name;
@@ -775,7 +955,7 @@ class Form_Processor_MailChimp_Admin {
 	}
 
 	/**
-	* Display for a dropdown
+	* Display for a dropdown/select
 	*
 	* @param array $args
 	*/
