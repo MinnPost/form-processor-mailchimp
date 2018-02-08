@@ -62,12 +62,28 @@ class Form_Processor_MailChimp_Processor {
 		$namespace = $this->namespace . $this->api_version;
 		$method_list = get_option( $this->option_prefix . 'http_methods', '' );
 
-		register_rest_route( $namespace, '/(?P<resource_type_id>([\w-])+)/', array(
+		register_rest_route( $namespace, '/(?P<resource_type>([\w-])+)/', array(
 			array(
 				'methods' => $method_list,
 				'callback' => array( $this, 'process' ),
 				'args' => array(
-					'resource_type_id' => array(
+					'resource_type' => array(
+						'validate_callback' => array( $this, 'check_resource_type' ),
+					),
+				),
+				'permission_callback' => array( $this, 'can_process' ),
+			),
+		) );
+
+		register_rest_route( $namespace, '/(?P<resource_type>([\w-])+)/' . '(?P<resource>([\w-])+)/', array(
+			array(
+				'methods' => $method_list,
+				'callback' => array( $this, 'process' ),
+				'args' => array(
+					'resource_type' => array(
+						'validate_callback' => array( $this, 'check_resource_type' ),
+					),
+					'resource' => array(
 						'validate_callback' => 'sanitize_key',
 					),
 				),
@@ -75,15 +91,18 @@ class Form_Processor_MailChimp_Processor {
 			),
 		) );
 
-		register_rest_route( $namespace, '/(?P<resource_type_id>([\w-])+)/' . '(?P<resource_id>([\w-])+)/', array(
+		register_rest_route( $namespace, '/(?P<resource_type>([\w-])+)/' . '(?P<resource>([\w-])+)/' . '(?P<subresource_type>([\w-])+)/', array(
 			array(
 				'methods' => $method_list,
 				'callback' => array( $this, 'process' ),
 				'args' => array(
-					'resource_type_id' => array(
+					'resource_type' => array(
+						'validate_callback' => array( $this, 'check_resource_type' ),
+					),
+					'resource' => array(
 						'validate_callback' => 'sanitize_key',
 					),
-					'resource_id' => array(
+					'subresource_type' => array(
 						'validate_callback' => 'sanitize_key',
 					),
 				),
@@ -91,18 +110,21 @@ class Form_Processor_MailChimp_Processor {
 			),
 		) );
 
-		register_rest_route( $namespace, '/(?P<resource_type_id>([\w-])+)/' . '(?P<resource_id>([\w-])+)/' . '(?P<subresource_type_id>([\w-])+)/', array(
+		register_rest_route( $namespace, '/(?P<resource_type>([\w-])+)/' . '(?P<resource>([\w-])+)/' . '(?P<subresource_type>([\w-])+)/' . '(?P<subresource>([\w-])+)/', array(
 			array(
 				'methods' => $method_list,
 				'callback' => array( $this, 'process' ),
 				'args' => array(
-					'resource_type_id' => array(
+					'resource_type' => array(
+						'validate_callback' => array( $this, 'check_resource_type' ),
+					),
+					'resource' => array(
 						'validate_callback' => 'sanitize_key',
 					),
-					'resource_id' => array(
+					'subresource_type' => array(
 						'validate_callback' => 'sanitize_key',
 					),
-					'subresource_type_id' => array(
+					'subresource' => array(
 						'validate_callback' => 'sanitize_key',
 					),
 				),
@@ -110,52 +132,45 @@ class Form_Processor_MailChimp_Processor {
 			),
 		) );
 
-		register_rest_route( $namespace, '/(?P<resource_type_id>([\w-])+)/' . '(?P<resource_id>([\w-])+)/' . '(?P<subresource_type_id>([\w-])+)/' . '(?P<subresource_id>([\w-])+)/', array(
+		register_rest_route( $namespace, '/(?P<resource_type>([\w-])+)/' . '(?P<resource>([\w-])+)/' . '(?P<subresource_type>([\w-])+)/' . '(?P<subresource>([\w-])+)/' . '(?P<method>([\w-])+)/', array(
 			array(
 				'methods' => $method_list,
 				'callback' => array( $this, 'process' ),
 				'args' => array(
-					'resource_type_id' => array(
+					'resource_type' => array(
+						'validate_callback' => array( $this, 'check_resource_type' ),
+					),
+					'resource' => array(
 						'validate_callback' => 'sanitize_key',
 					),
-					'resource_id' => array(
+					'subresource_type' => array(
 						'validate_callback' => 'sanitize_key',
 					),
-					'subresource_type_id' => array(
+					'subresource' => array(
 						'validate_callback' => 'sanitize_key',
 					),
-					'subresource_id' => array(
+					'method' => array(
 						'validate_callback' => 'sanitize_key',
 					),
 				),
 				'permission_callback' => array( $this, 'can_process' ),
 			),
 		) );
+	}
 
-		register_rest_route( $namespace, '/(?P<resource_type_id>([\w-])+)/' . '(?P<resource_id>([\w-])+)/' . '(?P<subresource_type_id>([\w-])+)/' . '(?P<subresource_id>([\w-])+)/' . '(?P<method_id>([\w-])+)/', array(
-			array(
-				'methods' => $method_list,
-				'callback' => array( $this, 'process' ),
-				'args' => array(
-					'resource_type_id' => array(
-						'validate_callback' => 'sanitize_key',
-					),
-					'resource_id' => array(
-						'validate_callback' => 'sanitize_key',
-					),
-					'subresource_type_id' => array(
-						'validate_callback' => 'sanitize_key',
-					),
-					'subresource_id' => array(
-						'validate_callback' => 'sanitize_key',
-					),
-					'method_id' => array(
-						'validate_callback' => 'sanitize_key',
-					),
-				),
-				'permission_callback' => array( $this, 'can_process' ),
-			),
-		) );
+	/**
+	* Check for a valid resource type
+	*
+	* @return $result
+	*/
+	public function check_resource_type( $resource_type ) {
+		if ( isset( $resource_type ) ) {
+			$allowed_resource_types = get_option( $this->option_prefix . 'resource_types', array() );
+			if ( in_array( $resource_type, $allowed_resource_types ) ) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**
