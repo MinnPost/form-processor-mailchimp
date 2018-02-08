@@ -700,17 +700,19 @@ class Form_Processor_MailChimp_Admin {
 			return $options;
 		}
 
-		foreach ( $methods[ $key ][0]['_links'] as $link ) {
-			if ( ! in_array( $link['rel'], array( 'self', 'parent', 'create', 'update', 'upsert', 'delete' ) ) ) {
-				$options[ $link['rel'] ] = array(
-					'resource_type' => $resource_type,
-					'resource' => $resource,
-					'subresource_type' => $subresource_type,
-					'text' => ucwords( str_replace( '-', ' ', $link['rel'] ) ),
-					'id' => $link['rel'],
-					'desc' => '',
-					'default' => '',
-				);
+		if ( isset( $methods[ $key ][0]['_links'] ) ) {
+			foreach ( $methods[ $key ][0]['_links'] as $link ) {
+				if ( ! in_array( $link['rel'], array( 'self', 'parent', 'create', 'update', 'upsert', 'delete' ) ) ) {
+					$options[ $link['rel'] ] = array(
+						'resource_type' => $resource_type,
+						'resource' => $resource,
+						'subresource_type' => $subresource_type,
+						'text' => ucwords( str_replace( '-', ' ', $link['rel'] ) ),
+						'id' => $link['rel'],
+						'desc' => '',
+						'default' => '',
+					);
+				}
 			}
 		}
 

@@ -103,7 +103,7 @@ class Form_Processor_MailChimp_Processor {
 						'validate_callback' => array( $this, 'check_resource' ),
 					),
 					'subresource_type' => array(
-						'validate_callback' => 'sanitize_key',
+						'validate_callback' => array( $this, 'check_subresource_type' ),
 					),
 				),
 				'permission_callback' => array( $this, 'can_process' ),
@@ -122,10 +122,10 @@ class Form_Processor_MailChimp_Processor {
 						'validate_callback' => array( $this, 'check_resource' ),
 					),
 					'subresource_type' => array(
-						'validate_callback' => 'sanitize_key',
+						'validate_callback' => array( $this, 'check_subresource_type' ),
 					),
 					'subresource' => array(
-						'validate_callback' => 'sanitize_key',
+						'validate_callback' => array( $this, 'check_subresource' ),
 					),
 				),
 				'permission_callback' => array( $this, 'can_process' ),
@@ -144,13 +144,13 @@ class Form_Processor_MailChimp_Processor {
 						'validate_callback' => array( $this, 'check_resource' ),
 					),
 					'subresource_type' => array(
-						'validate_callback' => 'sanitize_key',
+						'validate_callback' => array( $this, 'check_subresource_type' ),
 					),
 					'subresource' => array(
-						'validate_callback' => 'sanitize_key',
+						'validate_callback' => array( $this, 'check_subresource' ),
 					),
 					'method' => array(
-						'validate_callback' => 'sanitize_key',
+						'validate_callback' => array( $this, 'check_method' ),
 					),
 				),
 				'permission_callback' => array( $this, 'can_process' ),
@@ -188,6 +188,67 @@ class Form_Processor_MailChimp_Processor {
 		$resources = get_option( $this->option_prefix . 'resources_' . $resource_type, array() );
 		if ( isset( $resources[ $resource_type ] ) ) {
 			if ( in_array( $resource, $resources[ $resource_type ] ) ) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	* Check for a valid subresource type
+	*
+	* @param string $subresource_type
+	* @param object $request
+	* @return $result
+	*/
+	public function check_subresource_type( $subresource_type, $request ) {
+		$url_params = $request->get_url_params();
+		$resource_type = $url_params['resource_type'];
+		$subresource_types = get_option( $this->option_prefix . 'subresource_types_' . $resource_type, array() );
+		if ( isset( $subresource_types[ $resource_type ] ) ) {
+			if ( in_array( $subresource_type, $subresource_types[ $resource_type ] ) ) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	* Check for a valid subresource
+	*
+	* @param string $subresource
+	* @param object $request
+	* @return $result
+	*/
+	public function check_subresource( $subresource, $request ) {
+		$url_params = $request->get_url_params();
+		$resource_type = $url_params['resource_type'];
+		$resource = $url_params['resource'];
+		$subresource_type = $url_params['subresource_type'];
+		$subresources = get_option( $this->option_prefix . 'subresources_' . $resource . '_' . $subresource_type, array() );
+		if ( isset( $subresources[ $resource_type ][ $resource ][ $subresource_type ] ) ) {
+			if ( in_array( $subresource, $subresources[ $resource_type ][ $resource ][ $subresource_type ] ) ) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	* Check for a valid method
+	*
+	* @param string $method
+	* @param object $request
+	* @return $result
+	*/
+	public function check_method( $method, $request ) {
+		$url_params = $request->get_url_params();
+		$resource_type = $url_params['resource_type'];
+		$resource = $url_params['resource'];
+		$subresource_type = $url_params['subresource_type'];
+		$methods = get_option( $this->option_prefix . 'subresource_methods', array() );
+		if ( isset( $methods[ $resource_type ][ $resource ][ $subresource_type ] ) ) {
+			if ( in_array( $method, $methods[ $resource_type ][ $resource ][ $subresource_type ] ) ) {
 				return true;
 			}
 		}
