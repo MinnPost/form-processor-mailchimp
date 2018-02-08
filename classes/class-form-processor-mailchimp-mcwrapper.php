@@ -60,6 +60,7 @@ class Form_Processor_MailChimp_MCWrapper {
 	* @return array $data
 	*/
 	public function load( $call = '' ) {
+		//error_log( 'call is ' . $call );
 		$cached = $this->wordpress->cache_get( $call );
 		if ( is_array( $cached ) ) {
 			//error_log( 'yep it is cached' );
