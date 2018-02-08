@@ -17,6 +17,7 @@ class Form_Processor_MailChimp_MCWrapper {
 
 	protected $option_prefix;
 	protected $version;
+	protected $slug;
 	protected $wordpress;
 
 	/**
@@ -24,12 +25,14 @@ class Form_Processor_MailChimp_MCWrapper {
 	*
 	* @param string $option_prefix
 	* @param string $version
+	* @param string $slug
 	* @param object $wordpress
 	* @throws \Exception
 	*/
-	public function __construct( $option_prefix, $version, $wordpress ) {
+	public function __construct( $option_prefix, $version, $slug, $wordpress ) {
 		$this->option_prefix = $option_prefix;
 		$this->version = $version;
+		$this->slug = $slug;
 		$this->wordpress = $wordpress;
 
 		$this->mailchimp_api = $this->mailchimp_api();

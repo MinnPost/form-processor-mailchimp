@@ -16,6 +16,7 @@ class Form_Processor_MailChimp_Admin {
 
 	protected $option_prefix;
 	protected $version;
+	protected $slug;
 	protected $mailchimp;
 	protected $wordpress;
 
@@ -24,14 +25,16 @@ class Form_Processor_MailChimp_Admin {
 	*
 	* @param string $option_prefix
 	* @param string $version
+	* @param string $slug
 	* @param object $wordpress
 	* @param object $mailchimp
 	* @throws \Exception
 	*/
-	public function __construct( $option_prefix, $version, $wordpress, $mailchimp ) {
+	public function __construct( $option_prefix, $version, $slug, $wordpress, $mailchimp ) {
 
 		$this->option_prefix = $option_prefix;
 		$this->version = $version;
+		$this->slug = $slug;
 		$this->wordpress = $wordpress;
 		$this->mailchimp = $mailchimp;
 
@@ -68,7 +71,7 @@ class Form_Processor_MailChimp_Admin {
 	*/
 	public function create_admin_menu() {
 		$title = __( 'MailChimp Forms', 'form-processor-mailchimp' );
-		add_options_page( $title, $title, 'manage_options', 'form-processor-mailchimp', array( $this, 'show_admin_page' ) );
+		add_options_page( $title, $title, 'manage_options', $this->slug, array( $this, 'show_admin_page' ) );
 	}
 
 	/**
@@ -142,7 +145,7 @@ class Form_Processor_MailChimp_Admin {
 			if ( 'mc_settings' === $tab_key || ( isset( $mailchimp_api ) && ! empty( $mailchimp_api ) ) ) {
 				echo sprintf( '<a class="nav-tab%1$s" href="%2$s">%3$s</a>',
 					esc_attr( $active ),
-					esc_url( '?page=form-processor-mailchimp&tab=' . $tab_key ),
+					esc_url( '?page=' . $this->slug . '&tab=' . $tab_key ),
 					esc_html( $tab_caption )
 				);
 			}

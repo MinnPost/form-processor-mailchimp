@@ -16,18 +16,21 @@ class Form_Processor_MailChimp_WPWrapper {
 
 	protected $option_prefix;
 	protected $version;
+	protected $slug;
 
 	/**
 	* Constructor which sets up WordPress methods
 	*
 	* @param string $option_prefix
 	* @param string $version
+	* @param string $slug
 	* @throws \Exception
 	*/
-	public function __construct( $option_prefix, $version ) {
+	public function __construct( $option_prefix, $version, $slug ) {
 
 		$this->option_prefix = $option_prefix;
 		$this->version = $version;
+		$this->slug = $slug;
 
 		$this->cache = true;
 

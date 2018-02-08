@@ -96,6 +96,7 @@ class Form_Processor_MailChimp {
 	public function __construct() {
 
 		$this->version = '0.0.1';
+		$this->slug = 'form-processor-mailchimp';
 
 		//The namespace and version for the REST SERVER
 		$this->namespace = 'form-processor-mc/v';
@@ -127,7 +128,7 @@ class Form_Processor_MailChimp {
 	 */
 	private function wordpress() {
 		require_once( plugin_dir_path( __FILE__ ) . 'classes/class-form-processor-mailchimp-wpwrapper.php' );
-		$wordpress = new Form_Processor_MailChimp_WPWrapper( $this->option_prefix, $this->version );
+		$wordpress = new Form_Processor_MailChimp_WPWrapper( $this->option_prefix, $this->version, $this->slug );
 		return $wordpress;
 	}
 
@@ -138,7 +139,7 @@ class Form_Processor_MailChimp {
 	 */
 	private function mailchimp() {
 		require_once( plugin_dir_path( __FILE__ ) . 'classes/class-form-processor-mailchimp-mcwrapper.php' );
-		$mailchimp = new Form_Processor_MailChimp_MCWrapper( $this->option_prefix, $this->version, $this->wordpress );
+		$mailchimp = new Form_Processor_MailChimp_MCWrapper( $this->option_prefix, $this->version, $this->slug, $this->wordpress );
 		return $mailchimp;
 	}
 
@@ -149,7 +150,7 @@ class Form_Processor_MailChimp {
 	 */
 	private function processor() {
 		require_once( plugin_dir_path( __FILE__ ) . 'classes/class-form-processor-mailchimp-processor.php' );
-		$processor = new Form_Processor_MailChimp_Processor( $this->option_prefix, $this->version, $this->namespace, $this->api_version, $this->wordpress, $this->mailchimp );
+		$processor = new Form_Processor_MailChimp_Processor( $this->option_prefix, $this->version, $this->slug, $this->namespace, $this->api_version, $this->wordpress, $this->mailchimp );
 		return $processor;
 	}
 
@@ -160,7 +161,7 @@ class Form_Processor_MailChimp {
 	 */
 	private function load_admin() {
 		require_once( plugin_dir_path( __FILE__ ) . 'classes/class-form-processor-mailchimp-admin.php' );
-		$admin = new Form_Processor_MailChimp_Admin( $this->option_prefix, $this->version, $this->wordpress, $this->mailchimp );
+		$admin = new Form_Processor_MailChimp_Admin( $this->option_prefix, $this->version, $this->slug, $this->wordpress, $this->mailchimp );
 		add_filter( 'plugin_action_links', array( $this, 'plugin_action_links' ), 10, 2 );
 		return $admin;
 	}
