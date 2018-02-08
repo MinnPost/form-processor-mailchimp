@@ -84,7 +84,7 @@ class Form_Processor_MailChimp_Processor {
 						'validate_callback' => array( $this, 'check_resource_type' ),
 					),
 					'resource' => array(
-						'validate_callback' => 'sanitize_key',
+						'validate_callback' => array( $this, 'check_resource' ),
 					),
 				),
 				'permission_callback' => array( $this, 'can_process' ),
@@ -100,7 +100,7 @@ class Form_Processor_MailChimp_Processor {
 						'validate_callback' => array( $this, 'check_resource_type' ),
 					),
 					'resource' => array(
-						'validate_callback' => 'sanitize_key',
+						'validate_callback' => array( $this, 'check_resource' ),
 					),
 					'subresource_type' => array(
 						'validate_callback' => 'sanitize_key',
@@ -119,7 +119,7 @@ class Form_Processor_MailChimp_Processor {
 						'validate_callback' => array( $this, 'check_resource_type' ),
 					),
 					'resource' => array(
-						'validate_callback' => 'sanitize_key',
+						'validate_callback' => array( $this, 'check_resource' ),
 					),
 					'subresource_type' => array(
 						'validate_callback' => 'sanitize_key',
@@ -141,7 +141,7 @@ class Form_Processor_MailChimp_Processor {
 						'validate_callback' => array( $this, 'check_resource_type' ),
 					),
 					'resource' => array(
-						'validate_callback' => 'sanitize_key',
+						'validate_callback' => array( $this, 'check_resource' ),
 					),
 					'subresource_type' => array(
 						'validate_callback' => 'sanitize_key',
@@ -161,12 +161,33 @@ class Form_Processor_MailChimp_Processor {
 	/**
 	* Check for a valid resource type
 	*
+	* @param string $resource_type
+	* @param object $request
 	* @return $result
 	*/
-	public function check_resource_type( $resource_type ) {
+	public function check_resource_type( $resource_type, $request ) {
 		if ( isset( $resource_type ) ) {
 			$allowed_resource_types = get_option( $this->option_prefix . 'resource_types', array() );
 			if ( in_array( $resource_type, $allowed_resource_types ) ) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	* Check for a valid resource
+	*
+	* @param string $resource
+	* @param object $request
+	* @return $result
+	*/
+	public function check_resource( $resource, $request ) {
+		$url_params = $request->get_url_params();
+		$resource_type = $url_params['resource_type'];
+		$resources = get_option( $this->option_prefix . 'resources_' . $resource_type, array() );
+		if ( isset( $resources[ $resource_type ] ) ) {
+			if ( in_array( $resource, $resources[ $resource_type ] ) ) {
 				return true;
 			}
 		}
