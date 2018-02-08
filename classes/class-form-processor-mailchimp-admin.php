@@ -642,22 +642,22 @@ class Form_Processor_MailChimp_Admin {
 	*
 	* @param string $resource_type
 	* @param string $resource
-	* @param string $subresource
+	* @param string $subresource_type
 	* @return array $options
 	*
 	*/
-	private function get_mailchimp_method_options( $resource_type = '', $resource = '', $subresource = '' ) {
+	private function get_mailchimp_method_options( $resource_type = '', $resource = '', $subresource_type = '' ) {
 
-		$methods = $this->mailchimp->load( $resource_type . '/' . $resource . '/' . $subresource );
+		$methods = $this->mailchimp->load( $resource_type . '/' . $resource . '/' . $subresource_type );
 		$options = array();
 
-		$key = $subresource;
+		$key = $subresource_type;
 		if ( ! isset( $methods[ $key ] ) ) {
-			if ( isset( $methods[ sanitize_title( $subresource ) ] ) ) {
-				$key = sanitize_title( $subresource );
+			if ( isset( $methods[ sanitize_title( $subresource_type ) ] ) ) {
+				$key = sanitize_title( $subresource_type );
 			}
-			if ( isset( $methods[ substr( $subresource, strpos( $subresource, '-' ) + 1 ) ] ) ) {
-				$key = substr( $subresource, strpos( $subresource, '-' ) + 1 );
+			if ( isset( $methods[ substr( $subresource_type, strpos( $subresource_type, '-' ) + 1 ) ] ) ) {
+				$key = substr( $subresource_type, strpos( $subresource_type, '-' ) + 1 );
 			}
 		}
 		if ( ! isset( $methods[ $key ] ) || ! isset( $methods[ $key ][0] ) ) {
@@ -669,7 +669,7 @@ class Form_Processor_MailChimp_Admin {
 				$options[ $link['rel'] ] = array(
 					'resource_type' => $resource_type,
 					'resource' => $resource,
-					'subresource' => $subresource,
+					'subresource_type' => $subresource_type,
 					'text' => ucwords( str_replace( '-', ' ', $link['rel'] ) ),
 					'id' => $link['rel'],
 					'desc' => '',
