@@ -74,6 +74,8 @@ class Form_Processor_MailChimp_Admin {
 	/**
 	* Create WordPress admin options page tabs
 	*
+	* @return array $tabs
+	*
 	*/
 	private function get_admin_tabs() {
 		$tabs = array(
@@ -201,7 +203,7 @@ class Form_Processor_MailChimp_Admin {
 	*
 	* @param string $page
 	* @param string $section
-	* @param string $input_callback
+	* @param array $callbacks
 	*/
 	private function mc_settings( $page, $section, $callbacks ) {
 		$tabs = $this->tabs;
@@ -263,7 +265,7 @@ class Form_Processor_MailChimp_Admin {
 	*
 	* @param string $page
 	* @param string $section
-	* @param string $input_callback
+	* @param array $callbacks
 	*/
 	private function allowed_resources( $page, $section, $callbacks ) {
 		$tabs = $this->tabs;
@@ -333,7 +335,7 @@ class Form_Processor_MailChimp_Admin {
 	*
 	* @param string $page
 	* @param string $section
-	* @param string $input_callback
+	* @param array $callbacks
 	*/
 	private function resource_settings( $page, $section, $callbacks ) {
 
@@ -423,7 +425,7 @@ class Form_Processor_MailChimp_Admin {
 	*
 	* @param string $page
 	* @param string $section
-	* @param string $input_callback
+	* @param array $callbacks
 	*/
 	private function loaded_resources( $page, $section, $callbacks ) {
 
@@ -480,7 +482,7 @@ class Form_Processor_MailChimp_Admin {
 	*
 	* @param string $page
 	* @param string $section
-	* @param string $input_callback
+	* @param array $callbacks
 	*/
 	private function subresource_settings( $page, $section, $callbacks ) {
 		$resource_types = get_option( $this->option_prefix . 'resource_types', '' );
@@ -575,6 +577,7 @@ class Form_Processor_MailChimp_Admin {
 	/**
 	* Generate an array of checkboxes for MailChimp resources
 	*
+	* @param string $resource_type
 	* @return array $options
 	*
 	*/
@@ -596,6 +599,7 @@ class Form_Processor_MailChimp_Admin {
 	/**
 	* Generate an array of checkboxes for MailChimp subresource types
 	*
+	* @param string $resource_type
 	* @return array $options
 	*
 	*/
@@ -619,13 +623,14 @@ class Form_Processor_MailChimp_Admin {
 	/**
 	* Generate an array of checkboxes for MailChimp subresources
 	*
+	* @param string $resource_type
+	* @param string $resource_id
+	* @param string $subresource_type
 	* @return array $options
 	*
 	*/
 	private function get_mailchimp_subresource_options( $resource_type, $resource_id, $subresource_type ) {
-		//error_log( 'call is ' . $resource_type . '/' . $resource_id . '/' . $subresource_type );
 		$subresources = $this->mailchimp->load( $resource_type . '/' . $resource_id . '/' . $subresource_type );
-		//error_log( 'subresources is ' . print_r( $subresources[ $resource_type ], true ) );
 		$options = array();
 
 		$key = $subresource_type;
@@ -686,6 +691,9 @@ class Form_Processor_MailChimp_Admin {
 	/**
 	* Generate an array of checkboxes for MailChimp methods on subresource objects
 	*
+	* @param string $resource_type
+	* @param string $resource
+	* @param string $subresource
 	* @return array $options
 	*
 	*/
@@ -727,6 +735,8 @@ class Form_Processor_MailChimp_Admin {
 	/**
 	* Generate an array of checkboxes for MailChimp field options. I can't remember if this is being used.
 	*
+	* @param string $resource_name
+	* @param string $subresource_name
 	* @return array $options
 	*
 	*/
@@ -780,6 +790,7 @@ class Form_Processor_MailChimp_Admin {
 	/**
 	* Generate an array of checkboxes for MailChimp resource items
 	*
+	* @param string $resource
 	* @return array $options
 	*
 	*/
