@@ -61,8 +61,6 @@ class Form_Processor_MailChimp_Processor {
 	public function register_routes() {
 		$namespace = $this->namespace . $this->api_version;
 		$method_list = get_option( $this->option_prefix . 'http_methods', '' );
-		$resource_types = get_option( $this->option_prefix . 'resource_types', '' );
-		$subresource_methods = get_option( $this->option_prefix . 'subresource_methods', '' );
 
 		register_rest_route( $namespace, '/(?P<resource_type_id>([\w-])+)/', array(
 			array(
