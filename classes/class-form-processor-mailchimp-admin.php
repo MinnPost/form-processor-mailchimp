@@ -652,7 +652,7 @@ class Form_Processor_MailChimp_Admin {
 
 		foreach ( $subresources[ $key ] as $subresource ) {
 			if ( isset( $subresource['id'] ) && isset( $subresource['title'] ) ) {
-				$options[] = array(
+				$options[ $subresource['id'] ] = array(
 					'resource_type' => $resource_type,
 					'resource' => $resource_id,
 					'subresource_type' => $subresource_type,
