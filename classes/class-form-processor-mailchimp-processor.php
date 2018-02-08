@@ -105,6 +105,15 @@ class Form_Processor_MailChimp_Processor {
 												'permission_callback' => array( $this, 'can_process' ),
 											),
 										) );
+										foreach ( $subresource_methods[ $resource_type ][ $resource ][ $subresource_type ] as $method ) {
+											register_rest_route( $namespace, '/' . $resource_type . '/' . $resource . '/' . $subresource_type . '/' . $subresource . '/' . $method, array(
+												array(
+													'methods' => $method_list,
+													'callback' => array( $this, 'process' ),
+													'permission_callback' => array( $this, 'can_process' ),
+												),
+											) );
+										}
 									}
 								}
 							}
