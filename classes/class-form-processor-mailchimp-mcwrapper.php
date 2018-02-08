@@ -35,6 +35,11 @@ class Form_Processor_MailChimp_MCWrapper {
 		$this->mailchimp_api = $this->mailchimp_api();
 	}
 
+	/**
+	* Load the MailChimp API from composer
+	*
+	* @return object $mailchimp_api
+	*/
 	public function mailchimp_api() {
 		if ( ! class_exists( 'DrewM/Mailchimp/MailChimp' ) ) {
 			require_once plugin_dir_path( __FILE__ ) . '../vendor/autoload.php';
@@ -48,6 +53,12 @@ class Form_Processor_MailChimp_MCWrapper {
 		}
 	}
 
+	/**
+	* Run a GET request on API
+	*
+	* @param string $call
+	* @return array $data
+	*/
 	public function load( $call = '' ) {
 		$cached = $this->wordpress->cache_get( $call );
 		if ( is_array( $cached ) ) {
@@ -61,6 +72,14 @@ class Form_Processor_MailChimp_MCWrapper {
 		}
 	}
 
+	/**
+	* Run a POST or PUT request on API
+	*
+	* @param string $call
+	* @param string $method
+	* @param array $params
+	* @return array $result
+	*/
 	public function send( $call = '', $method = 'POST', $params = array() ) {
 		$result = '';
 		// this is not flexible enough for broad use, but it does work for the member update
@@ -92,9 +111,28 @@ class Form_Processor_MailChimp_MCWrapper {
 		return $result;
 	}
 
+	/**
+	* Run a DELETE request on API
+	*
+	* @param string $call
+	* @param string $id
+	* @return array $result
+	*/
 	public function remove( $call, $id ) {
 		$result = '';
 		return $result;
+	}
+
+	/**
+	* If we only have an object ID, get its name
+	*
+	* @param string $type
+	* @param string $id
+	* @return string $result
+	*/
+	public function get_name( $type, $id ) {
+		$result = $this->load( $type . '/' . $id );
+		return $result['name'];
 	}
 
 }
