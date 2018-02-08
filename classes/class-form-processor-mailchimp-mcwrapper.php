@@ -130,9 +130,19 @@ class Form_Processor_MailChimp_MCWrapper {
 	* @param string $id
 	* @return string $result
 	*/
-	public function get_name( $type, $id ) {
-		$result = $this->load( $type . '/' . $id );
-		return $result['name'];
+	public function get_name( $type, $id, $subtype = '', $subid = '' ) {
+		if ( '' !== $subtype ) {
+			$subtype = '/' . $subtype;
+		}
+		if ( '' !== $subid ) {
+			$subid = '/' . $subid;
+		}
+		$result = $this->load( $type . '/' . $id . $subtype . $subid );
+		if ( isset( $result['name'] ) ) {
+			return $result['name'];
+		} elseif ( isset( $result['title'] ) ) {
+			return $result['title'];
+		}
 	}
 
 }
