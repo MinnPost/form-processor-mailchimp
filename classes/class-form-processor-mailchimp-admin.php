@@ -287,8 +287,13 @@ class Form_Processor_MailChimp_Admin {
 
 		if ( '' !== get_option( $this->option_prefix . 'resource_types', '' ) ) {
 			foreach ( get_option( $this->option_prefix . 'resource_types', '' ) as $type ) {
+				// translators: parameter is the resource type
+				$title = sprintf( 'Allowed Resources - %1$s',
+					ucfirst( $type )
+				);
+
 				$settings[ 'resources_' . $type ] = array(
-					'title' => __( 'Allowed Resources - ', 'form-processor-mailchimp' ) . ucfirst( $type ),
+					'title' => $title,
 					'callback' => $callbacks['checkboxes'],
 					'page' => $page,
 					'section' => $section,
@@ -368,8 +373,15 @@ class Form_Processor_MailChimp_Admin {
 
 								$options = $this->get_mailchimp_subresource_options( $resource_type, $resource, $subresource_type );
 								if ( ! empty( $options ) ) {
+
+									// translators: 1) is the subresource type, replacing dashes with spaces; 2 is the name of the resource
+									$title = sprintf( 'Allowed %1$s - %2$s',
+										ucwords( str_replace( '-', ' ', $subresource_type ) ),
+										ucfirst( $resource_name )
+									);
+
 									$resource_settings[ 'subresources_' . $resource . '_' . $subresource_type ] = array(
-										'title' => __( 'Allowed ' . ucwords( str_replace( '-', ' ', $subresource_type ) ) . ' - ', 'form-processor-mailchimp' ) . ucfirst( $resource_name ),
+										'title' => $title,
 										'callback' => $callbacks['checkboxes'],
 										'page' => $page,
 										'section' => $section,
