@@ -64,64 +64,100 @@ class Form_Processor_MailChimp_Processor {
 		$resource_types = get_option( $this->option_prefix . 'resource_types', '' );
 		$subresource_methods = get_option( $this->option_prefix . 'subresource_methods', '' );
 
-		if ( '' !== $resource_types && is_array( $resource_types ) ) {
-			foreach ( $resource_types as $key => $resource_type ) {
-				register_rest_route( $namespace, '/' . $resource_type, array(
-					array(
-						'methods' => $method_list,
-						'callback' => array( $this, 'process' ),
-						'permission_callback' => array( $this, 'can_process' ),
+		register_rest_route( $namespace, '/(?P<resource_type_id>([\w-])+)/', array(
+			array(
+				'methods' => $method_list,
+				'callback' => array( $this, 'process' ),
+				'args' => array(
+					'resource_type_id' => array(
+						'validate_callback' => 'sanitize_key',
 					),
-				) );
-				$subresource_types = get_option( $this->option_prefix . 'subresource_types_' . $resource_type, '' );
-				$resources = get_option( $this->option_prefix . 'resources_' . $resource_type, '' );
-				if ( '' !== $resources && is_array( $resources ) ) {
-					foreach ( $resources[ $resource_type ] as $resource ) {
-						register_rest_route( $namespace, '/' . $resource_type . '/' . $resource . '/', array(
-							array(
-								'methods' => $method_list,
-								'callback' => array( $this, 'process' ),
-								'permission_callback' => array( $this, 'can_process' ),
-							),
-						) );
-						if ( '' !== $subresource_types && is_array( $subresource_types ) ) {
-							foreach ( $subresource_types[ $resource_type ] as $subresource_type ) {
-								register_rest_route( $namespace, '/' . $resource_type . '/' . $resource . '/' . $subresource_type, array(
-									array(
-										'methods' => $method_list,
-										'callback' => array( $this, 'process' ),
-										'permission_callback' => array( $this, 'can_process' ),
-									),
-								) );
+				),
+				'permission_callback' => array( $this, 'can_process' ),
+			),
+		) );
 
-								$subresources = get_option( $this->option_prefix . 'subresources_' . $resource . '_' . $subresource_type, '' );
+		register_rest_route( $namespace, '/(?P<resource_type_id>([\w-])+)/' . '(?P<resource_id>([\w-])+)/', array(
+			array(
+				'methods' => $method_list,
+				'callback' => array( $this, 'process' ),
+				'args' => array(
+					'resource_type_id' => array(
+						'validate_callback' => 'sanitize_key',
+					),
+					'resource_id' => array(
+						'validate_callback' => 'sanitize_key',
+					),
+				),
+				'permission_callback' => array( $this, 'can_process' ),
+			),
+		) );
 
-								if ( isset( $subresources ) && is_array( $subresources ) ) {
-									foreach ( $subresources[ $resource_type ][ $resource ][ $subresource_type ] as $subresource ) {
-										register_rest_route( $namespace, '/' . $resource_type . '/' . $resource . '/' . $subresource_type . '/' . $subresource, array(
-											array(
-												'methods' => $method_list,
-												'callback' => array( $this, 'process' ),
-												'permission_callback' => array( $this, 'can_process' ),
-											),
-										) );
-										foreach ( $subresource_methods[ $resource_type ][ $resource ][ $subresource_type ] as $method ) {
-											register_rest_route( $namespace, '/' . $resource_type . '/' . $resource . '/' . $subresource_type . '/' . $subresource . '/' . $method, array(
-												array(
-													'methods' => $method_list,
-													'callback' => array( $this, 'process' ),
-													'permission_callback' => array( $this, 'can_process' ),
-												),
-											) );
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		}
+		register_rest_route( $namespace, '/(?P<resource_type_id>([\w-])+)/' . '(?P<resource_id>([\w-])+)/' . '(?P<subresource_type_id>([\w-])+)/', array(
+			array(
+				'methods' => $method_list,
+				'callback' => array( $this, 'process' ),
+				'args' => array(
+					'resource_type_id' => array(
+						'validate_callback' => 'sanitize_key',
+					),
+					'resource_id' => array(
+						'validate_callback' => 'sanitize_key',
+					),
+					'subresource_type_id' => array(
+						'validate_callback' => 'sanitize_key',
+					),
+				),
+				'permission_callback' => array( $this, 'can_process' ),
+			),
+		) );
+
+		register_rest_route( $namespace, '/(?P<resource_type_id>([\w-])+)/' . '(?P<resource_id>([\w-])+)/' . '(?P<subresource_type_id>([\w-])+)/' . '(?P<subresource_id>([\w-])+)/', array(
+			array(
+				'methods' => $method_list,
+				'callback' => array( $this, 'process' ),
+				'args' => array(
+					'resource_type_id' => array(
+						'validate_callback' => 'sanitize_key',
+					),
+					'resource_id' => array(
+						'validate_callback' => 'sanitize_key',
+					),
+					'subresource_type_id' => array(
+						'validate_callback' => 'sanitize_key',
+					),
+					'subresource_id' => array(
+						'validate_callback' => 'sanitize_key',
+					),
+				),
+				'permission_callback' => array( $this, 'can_process' ),
+			),
+		) );
+
+		register_rest_route( $namespace, '/(?P<resource_type_id>([\w-])+)/' . '(?P<resource_id>([\w-])+)/' . '(?P<subresource_type_id>([\w-])+)/' . '(?P<subresource_id>([\w-])+)/' . '(?P<method_id>([\w-])+)/', array(
+			array(
+				'methods' => $method_list,
+				'callback' => array( $this, 'process' ),
+				'args' => array(
+					'resource_type_id' => array(
+						'validate_callback' => 'sanitize_key',
+					),
+					'resource_id' => array(
+						'validate_callback' => 'sanitize_key',
+					),
+					'subresource_type_id' => array(
+						'validate_callback' => 'sanitize_key',
+					),
+					'subresource_id' => array(
+						'validate_callback' => 'sanitize_key',
+					),
+					'method_id' => array(
+						'validate_callback' => 'sanitize_key',
+					),
+				),
+				'permission_callback' => array( $this, 'can_process' ),
+			),
+		) );
 	}
 
 	/**
