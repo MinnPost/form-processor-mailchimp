@@ -82,9 +82,7 @@ class Form_Processor_MailChimp_Admin {
 			'mc_settings' => 'MailChimp Settings',
 			'allowed_resources' => 'Allowed Resources',
 			'resource_settings' => 'Resource Settings',
-			//'loaded_resources' => 'Loaded Resources',
 			'subresource_settings' => 'Subresource Settings',
-			//'schedule' => 'Scheduling',
 		); // this creates the tabs for the admin
 		return $tabs;
 	}
@@ -115,9 +113,6 @@ class Form_Processor_MailChimp_Admin {
 				case 'resource_settings':
 					require_once( plugin_dir_path( __FILE__ ) . '/../templates/admin/settings.php' );
 					break;
-				//case 'loaded_resources':
-				//	require_once( plugin_dir_path( __FILE__ ) . '/../templates/admin/settings.php' );
-				//	break;
 				case 'subresource_settings':
 					require_once( plugin_dir_path( __FILE__ ) . '/../templates/admin/settings.php' );
 					break;
@@ -191,7 +186,6 @@ class Form_Processor_MailChimp_Admin {
 		if ( '' !== $mailchimp_api ) {
 			$this->allowed_resources( 'allowed_resources', 'allowed_resources', $all_field_callbacks );
 			$this->resource_settings( 'resource_settings', 'resource_settings', $all_field_callbacks );
-			//$this->loaded_resources( 'loaded_resources', 'loaded_resources', $all_field_callbacks );
 			$this->subresource_settings( 'subresource_settings', 'subresource_settings', $all_field_callbacks );
 		}
 
@@ -415,63 +409,6 @@ class Form_Processor_MailChimp_Admin {
 				}
 			}
 			$settings[ $resource_type ] = $resource_settings;
-		}
-
-	}
-
-	/**
-	* Fields for the Loaded Resources tab
-	* This runs add_settings_section once, as well as add_settings_field and register_setting methods for each option
-	*
-	* @param string $page
-	* @param string $section
-	* @param array $callbacks
-	*/
-	private function loaded_resources( $page, $section, $callbacks ) {
-
-		$resources = get_option( $this->option_prefix . 'resources', '' );
-
-		if ( '' !== $resources ) {
-			$settings = array();
-			foreach ( $resources as $resource ) {
-				$section = $section . '_' . $resource;
-				add_settings_section( $section, ucwords( $resource ), null, $page );
-				$loaded_resources = array(
-					'loaded_resources' => array(
-						'title' => __( 'Loaded Items', 'form-processor-mailchimp' ),
-						'callback' => $callbacks['checkboxes'],
-						'page' => $page,
-						'section' => $section,
-						'args' => array(
-							'resource' => $resource,
-							'subresource' => '',
-							'type' => 'select',
-							'desc' => '',
-							'items' => $this->get_mailchimp_load_resource_items( $resource ),
-						),
-					),
-				);
-				foreach ( $loaded_resources as $key => $attributes ) {
-					$id = $this->option_prefix . $key;
-					$name = $this->option_prefix . $key;
-					$title = $attributes['title'];
-					$callback = $attributes['callback'];
-					$page = $attributes['page'];
-					$section = $attributes['section'];
-					$args = array_merge(
-						$attributes['args'],
-						array(
-							'title' => $title,
-							'id' => $id,
-							'label_for' => $id,
-							'name' => $name,
-						)
-					);
-					add_settings_field( $id, $title, $callback, $page, $section, $args );
-					register_setting( $page, $id );
-				}
-			}
-			$settings[ $resource ] = $loaded_resources;
 		}
 
 	}
@@ -729,112 +666,6 @@ class Form_Processor_MailChimp_Admin {
 			}
 		}
 
-		return $options;
-	}
-
-	/**
-	* Generate an array of checkboxes for MailChimp field options. I can't remember if this is being used.
-	*
-	* @param string $resource_name
-	* @param string $subresource_name
-	* @return array $options
-	*
-	*/
-	private function get_mailchimp_field_options( $resource_name = '', $subresource_name = '' ) {
-		$options = array();
-		$resource = $this->mailchimp->load( $resource_name );
-		//error_log( 'resource is ' . print_r( $resource, true ) );
-		if ( '' === $subresource_name ) {
-			foreach ( $resource['_links'] as $link ) {
-				if ( 'create' === $link['rel'] ) {
-					$url = $link['schema'];
-					continue;
-				}
-			}
-		} else {
-			$loaded_resources = get_option( $this->option_prefix . 'loaded_resources', '' );
-			foreach ( $loaded_resources as $loaded_resource ) {
-				$id = $loaded_resource[0];
-				//error_log( 'api url is ' . $resource . '/' . $id . '/' . $subresource_name );
-				$subresource = $this->mailchimp->load( $resource_name . '/' . $id . '/' . $subresource_name );
-				//error_log( 'sub is ' . print_r( $subresource, true ) );
-				foreach ( $subresource['_links'] as $link ) {
-					if ( 'create' === $link['rel'] ) {
-						//error_log('link is ' . print_r($link, true ));
-						$url = $link['schema'];
-						continue;
-					}
-				}
-			}
-		}
-
-		$request = wp_remote_get( $url );
-		if ( is_wp_error( $request ) ) {
-			return $options;
-		}
-
-		$body = wp_remote_retrieve_body( $request );
-		$data = json_decode( $body, true );
-		if ( ! empty( $data ) ) {
-			//error_log( 'data is ' . print_r( $data, true ) );
-			foreach ( $data['properties'] as $property ) {
-				error_log( 'property is ' . print_r( $property, true ) );
-			}
-		}
-
-		return $options;
-
-		//error_log( 'url is ' . $url );
-	}
-
-	/**
-	* Generate an array of checkboxes for MailChimp resource items
-	*
-	* @param string $resource
-	* @return array $options
-	*
-	*/
-	private function get_mailchimp_load_resource_items( $resource = '' ) {
-		$options = array();
-		if ( '' !== $resource ) {
-			$resources = $this->mailchimp->load( $resource );
-			foreach ( $resources[ $resource ] as $item ) {
-				if ( isset( $item['name'] ) ) {
-					$text = $item['name'];
-				} else {
-					if ( 'campaigns' === $resource ) {
-						$text = $item['settings']['title'];
-					}
-				}
-				$options[ $item['id'] ] = array(
-					'text' => $text,
-					'id' => $item['id'],
-					'desc' => '',
-					'default' => '',
-				);
-			}
-		}
-		return $options;
-	}
-
-	/**
-	* Generate an array of checkboxes for MailChimp list options
-	*
-	* @return array $options
-	*
-	*/
-	private function get_mailchimp_lists_options() {
-		$mailchimp_api = $this->mailchimp->mailchimp_api;
-		$lists = $this->mailchimp->load( 'lists' );
-		$options = array();
-		foreach ( $lists['lists'] as $list ) {
-			$options[ $list['id'] ] = array(
-				'text' => $list['name'],
-				'id' => $list['id'],
-				'desc' => '',
-				'default' => '',
-			);
-		}
 		return $options;
 	}
 
