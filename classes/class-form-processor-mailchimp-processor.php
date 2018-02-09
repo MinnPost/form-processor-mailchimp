@@ -279,28 +279,29 @@ class Form_Processor_MailChimp_Processor {
 	public function process( WP_REST_Request $request ) {
 		// see methods: https://developer.wordpress.org/reference/classes/wp_rest_request/
 		//error_log( 'request is ' . print_r( $request, true ) );
-		$method = $request->get_method();
+		$http_method = $request->get_method();
 		$route = $request->get_route();
 		$url_params = $request->get_url_params();
 		$body_params = $request->get_body_params();
 		$api_call = str_replace( '/' . $this->namespace . $this->api_version . '/', '', $route );
 		//error_log( 'api call is ' . $api_call . ' and params are ' . print_r( $params, true ) );
-		switch ( $method ) {
+
+		switch ( $http_method ) {
 			case 'GET':
-				$result = $this->mailchimp->load( $api_call );
+				$result = $this->mailchimp->load( $api_call, $url_params );
 				return $result;
 				break;
 			case 'POST':
-				$result = $this->mailchimp->send( $api_call, $method, $body_params );
+				$result = $this->mailchimp->send( $api_call, $http_method, $body_params );
 				return $result;
 				break;
 			case 'PATCH':
 				return 'edit existing';
-				$result = $this->mailchimp->send( $api_call, $method, $body_params );
+				$result = $this->mailchimp->send( $api_call, $http_method, $body_params );
 				return $result;
 				break;
 			case 'PUT':
-				$result = $this->mailchimp->send( $api_call, $method, $body_params );
+				$result = $this->mailchimp->send( $api_call, $http_method, $body_params );
 				return $result;
 				break;
 			case 'DELETE':
