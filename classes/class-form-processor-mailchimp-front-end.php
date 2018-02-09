@@ -50,11 +50,40 @@ class Form_Processor_MailChimp_Front_End {
 		// do some wordpress hook stuff
 	}
 
-	public function generate_interest_options( $list_id, $category_id = '' ) {
+	public function generate_interest_options( $list_id, $category_id = '', $keys = array(), $field_value = 'id' ) {
 		// need to try to generate a field this way i think
+		$interest_options = array();
 		if ( '' !== $category_id ) {
-			$list = $this->mailchimp->load( 'lists/' . $list_id . 'interest-categories/' . $category_id );
-			return $list;
+			$resource_type = 'lists';
+			$subresource_type = 'interest-categories';
+			$method = 'interests';
+
+			$params = array(
+				'resource_type' => $resource_type,
+				'subresource_type' => $subresource_type,
+				'method' => $method,
+			);
+
+			$interest_categories = $this->mailchimp->load( $resource_type . '/' . $list_id . '/' . $subresource_type );
+			foreach ( $interest_categories['categories'] as $key => $category ) {
+				$id = $category['id'];
+				$title = $category['title'];
+
+				$params['resource'] = $list_id;
+				$params['subresource'] = $id;
+
+				$interests = $this->mailchimp->load( $resource_type . '/' . $list_id . '/' . $subresource_type . '/' . $id . '/' . $method, $params );
+
+				$id = isset( $keys[ $key ] ) ? $keys[ $key ] : $category['id'];
+				$interest_options[ $id ]['title'] = $title;
+				$interest_options[ $id ]['interests'] = array();
+				foreach ( $interests['interests'] as $interest ) {
+					$interest_id = $interest['id'];
+					$interest_name = $interest['name'];
+					$interest_options[ $id ]['interests'][ ${'interest_' . $field_value} ] = $interest_name;
+				}
+			}
+			return $interest_options;
 		}
 	}
 
