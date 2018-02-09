@@ -60,20 +60,35 @@ class Form_Processor_MailChimp_MCWrapper {
 	* Run a GET request on API
 	*
 	* @param string $call
+	* @param array $params
 	* @return array $data
 	*/
-	public function load( $call = '' ) {
+	public function load( $call = '', $params = array() ) {
 		//error_log( 'call is ' . $call );
+		$resource_type = isset( $params['resource_type'] ) ? $params['resource_type'] : '';
+		$resource = isset( $params['resource'] ) ? $params['resource'] : '';
+		$subresource_type = isset( $params['subresource_type'] ) ? $params['subresource_type'] : '';
+		$subresource = isset( $params['subresource'] ) ? $params['subresource'] : '';
+		$method = isset( $params['method'] ) ? $params['method'] : '';
+
 		$cached = $this->wordpress->cache_get( $call );
 		if ( is_array( $cached ) ) {
-			//error_log( 'yep it is cached' );
-			return $cached;
+			$data = $cached;
 		} else {
-			//error_log( 'nope. cached is ' . print_r( $cached, true ) );
 			$data = $this->mailchimp_api->get( $call );
 			$cached = $this->wordpress->cache_set( $call, $data );
-			return $data;
 		}
+
+		if ( '' !== $method ) {
+			$allowed_items = get_option( $this->option_prefix . 'items_' . $resource . '_' . $subresource_type . '_' . $subresource . '_' . $method, false )[ $resource_type ][ $resource ][ $subresource_type ];
+			foreach ( $data[ $method ] as $key => $item ) {
+				if ( ! in_array( $item['id'], $allowed_items ) ) {
+					unset( $data[ $method ][ $key ] );
+				}
+			}
+		}
+
+		return $data;
 	}
 
 	/**
