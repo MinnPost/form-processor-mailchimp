@@ -43,11 +43,12 @@ class Form_Processor_MailChimp_WPWrapper {
 	 * if it does, return the transient for that key
 	 *
 	 * @param string $call The API call we'd like to make.
+	 * @param bool $reset Whether to reset the cache value
 	 * @return $this->mc_form_transients->get $cachekey
 	 */
-	public function cache_get( $call ) {
+	public function cache_get( $call, $reset = false ) {
 		$cachekey = md5( wp_json_encode( $call ) );
-		return $this->mc_form_transients->get( $cachekey );
+		return $this->mc_form_transients->get( $cachekey, $reset );
 	}
 
 	/**
@@ -72,6 +73,7 @@ class Mailchimp_Form_Processor_WordPress_Transient {
 	protected $name;
 
 	public $cache_expiration;
+	public $cache_prefix;
 
 	/**
 	 * Constructor which sets cache options and the name of the field that lists this plugin's cache keys.
@@ -101,28 +103,37 @@ class Mailchimp_Form_Processor_WordPress_Transient {
 	 * @param int $cache_expiration. How long the plugin key cache, and this individual item cache, should last before expiring.
 	 * @return mixed value of transient. False of empty, otherwise array.
 	 */
-	public function set( $cachekey, $value ) {
+	public function set( $cachekey, $value, $cache_expiration = '' ) {
+
+		if ( '' === $cache_expiration ) {
+			$cache_expiration = $this->cache_expiration;
+		}
 
 		$prefix = $this->cache_prefix;
 		$cachekey = $prefix . $cachekey;
 
 		$keys = $this->all_keys();
 		$keys[] = $cachekey;
-		set_transient( $this->name, $keys, $this->cache_expiration );
+		set_transient( $this->name, $keys, $cache_expiration );
 
-		return set_transient( $cachekey, $value, $this->cache_expiration );
+		return set_transient( $cachekey, $value, $cache_expiration );
 	}
 
 	/**
 	 * Get the individual cache value
 	 *
 	 * @param string $cachekey the key for this cache item
+	 * @param bool $reset whether to reset the cache for this value
 	 * @return mixed value of transient. False of empty, otherwise array.
 	 */
-	public function get( $cachekey ) {
+	public function get( $cachekey, $reset = false ) {
 		$prefix = $this->cache_prefix;
 		$cachekey = $prefix . $cachekey;
-		return get_transient( $cachekey );
+		if ( false === $reset ) {
+			return get_transient( $cachekey );
+		} else {
+			return '';
+		}
 	}
 
 	/**

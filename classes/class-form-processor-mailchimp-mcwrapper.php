@@ -61,17 +61,16 @@ class Form_Processor_MailChimp_MCWrapper {
 	*
 	* @param string $call
 	* @param array $params
+	* @param bool $reset
 	* @return array $data
 	*/
-	public function load( $call = '', $params = array() ) {
-		//error_log( 'call is ' . $call );
+	public function load( $call = '', $params = array(), $reset = false ) {
 		$resource_type = isset( $params['resource_type'] ) ? $params['resource_type'] : '';
 		$resource = isset( $params['resource'] ) ? $params['resource'] : '';
 		$subresource_type = isset( $params['subresource_type'] ) ? $params['subresource_type'] : '';
 		$subresource = isset( $params['subresource'] ) ? $params['subresource'] : '';
 		$method = isset( $params['method'] ) ? $params['method'] : '';
-
-		$cached = $this->wordpress->cache_get( $call );
+		$cached = $this->wordpress->cache_get( $call, $reset );
 		if ( is_array( $cached ) ) {
 			$data = $cached;
 		} else {
@@ -105,11 +104,15 @@ class Form_Processor_MailChimp_MCWrapper {
 		if ( 'PUT' === $method && isset( $params['email_address'] ) ) {
 			$call = $call . '/' . md5( $params['email_address'] );
 		}
+
 		foreach ( $params as $key => $value ) {
 			if ( is_array( $value ) || is_object( $value ) ) {
 				foreach ( $value as $subkey => $subvalue ) {
 					if ( 'true' === $subvalue || 'false' === $subvalue ) {
 						$subvalue = filter_var( $subvalue, FILTER_VALIDATE_BOOLEAN ); // try to force a boolean in case it is a string
+						if ( false === $subvalue ) {
+							$subvalue = '';
+						}
 					} else {
 						$subvalue = strip_tags( stripslashes( $subvalue ) );
 					}
@@ -125,7 +128,6 @@ class Form_Processor_MailChimp_MCWrapper {
 				$params[ $key ] = $value;
 			}
 		}
-
 		$result = $this->mailchimp_api->{ $method }( $call, $params );
 		return $result;
 	}
