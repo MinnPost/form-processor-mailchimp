@@ -234,6 +234,9 @@ class Form_Processor_MailChimp_Processor {
 				return true;
 			}
 		}
+		if ( empty( $subresources ) ) {
+			return true;
+		}
 		return false;
 	}
 
