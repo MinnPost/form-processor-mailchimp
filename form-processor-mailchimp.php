@@ -61,12 +61,6 @@ class Form_Processor_MailChimp {
 	public $admin;
 
 	/**
-	* @var object
-	* Load and initialize the Form_Processor_MailChimp_FrontEnd class
-	*/
-	public $front_end;
-
-	/**
 	 * @var object
 	 * Static property to hold an instance of the class; this seems to make it reusable
 	 *
@@ -116,9 +110,6 @@ class Form_Processor_MailChimp {
 		// admin settings
 		$this->admin = $this->load_admin();
 
-		// front end
-		$this->front_end = $this->front_end();
-
 	}
 
 	/**
@@ -164,17 +155,6 @@ class Form_Processor_MailChimp {
 		$admin = new Form_Processor_MailChimp_Admin( $this->option_prefix, $this->version, $this->slug, $this->wordpress, $this->mailchimp );
 		add_filter( 'plugin_action_links', array( $this, 'plugin_action_links' ), 10, 2 );
 		return $admin;
-	}
-
-	/**
-	 * Front end functionality
-	 *
-	 * @return object $front_end
-	 */
-	private function front_end() {
-		require_once( plugin_dir_path( __FILE__ ) . 'classes/class-form-processor-mailchimp-front-end.php' );
-		$front_end = new Form_Processor_MailChimp_Front_End( $this->option_prefix, $this->version, $this->wordpress, $this->mailchimp );
-		return $front_end;
 	}
 
 	/**
