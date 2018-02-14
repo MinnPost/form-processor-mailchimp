@@ -20,6 +20,8 @@ class Form_Processor_MailChimp_MCWrapper {
 	protected $slug;
 	protected $wordpress;
 
+	public $api_key;
+
 	/**
 	* Constructor which sets up admin pages
 	*
@@ -35,6 +37,8 @@ class Form_Processor_MailChimp_MCWrapper {
 		$this->slug = $slug;
 		$this->wordpress = $wordpress;
 
+		$this->api_key = get_option( $this->option_prefix . 'mailchimp_api_key', '' );
+
 		$this->mailchimp_api = $this->mailchimp_api();
 	}
 
@@ -47,7 +51,7 @@ class Form_Processor_MailChimp_MCWrapper {
 		if ( ! class_exists( 'DrewM/Mailchimp/MailChimp' ) ) {
 			require_once plugin_dir_path( __FILE__ ) . '../vendor/autoload.php';
 		}
-		$mailchimp_key = get_option( $this->option_prefix . 'mailchimp_api_key', '' );
+		$mailchimp_key = $this->api_key;
 		if ( '' !== $mailchimp_key ) {
 			$mailchimp_api = new MailChimp( $mailchimp_key );
 			return $mailchimp_api;

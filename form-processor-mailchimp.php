@@ -34,31 +34,31 @@ class Form_Processor_MailChimp {
 	* @var string
 	* The plugin's prefix for saving options
 	*/
-	private $option_prefix;
+	protected $option_prefix;
 
 	/**
 	* @var object
 	* Load and initialize the Form_Processor_MailChimp_WPWrapper class
 	*/
-	private $wordpress;
+	protected $wordpress;
 
 	/**
 	* @var object
 	* Load and initialize the Form_Processor_MailChimp_MCWrapper class
 	*/
-	private $mailchimp;
+	protected $mailchimp;
 
 	/**
 	* @var object
 	* Load and initialize the Form_Processor_MailChimp_Processor class
 	*/
-	private $processor;
+	protected $processor;
 
 	/**
 	* @var object
 	* Load and initialize the Form_Processor_MailChimp_Admin class
 	*/
-	private $admin;
+	public $admin;
 
 	/**
 	* @var object
@@ -159,7 +159,7 @@ class Form_Processor_MailChimp {
 	 *
 	 * @return object $admin
 	 */
-	private function load_admin() {
+	public function load_admin() {
 		require_once( plugin_dir_path( __FILE__ ) . 'classes/class-form-processor-mailchimp-admin.php' );
 		$admin = new Form_Processor_MailChimp_Admin( $this->option_prefix, $this->version, $this->slug, $this->wordpress, $this->mailchimp );
 		add_filter( 'plugin_action_links', array( $this, 'plugin_action_links' ), 10, 2 );
@@ -197,4 +197,3 @@ class Form_Processor_MailChimp {
 
 // Instantiate our class
 $form_processor_mailchimp = Form_Processor_MailChimp::get_instance();
-
