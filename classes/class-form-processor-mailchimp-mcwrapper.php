@@ -109,6 +109,14 @@ class Form_Processor_MailChimp_MCWrapper {
 			$call = $call . '/' . md5( $params['email_address'] );
 		}
 
+		if ( 'POST' === $method ) {
+			$call = $call . '/' . md5( $params['email_address'] );
+			$check_user = $this->load( $call, $params );
+			if ( isset( $check_user['id'] ) ) {
+				$method = 'PUT';
+			}
+		}
+
 		foreach ( $params as $key => $value ) {
 			if ( is_array( $value ) || is_object( $value ) ) {
 				foreach ( $value as $subkey => $subvalue ) {
