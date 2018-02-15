@@ -144,7 +144,7 @@ class Form_Processor_MailChimp_MCWrapper {
 		}
 
 		$result = $this->mailchimp_api->{ $method }( $call, $params );
-
+		$result['method'] = $method;
 		return $result;
 	}
 
