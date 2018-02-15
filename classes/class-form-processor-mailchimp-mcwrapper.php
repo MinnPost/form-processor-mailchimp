@@ -114,9 +114,9 @@ class Form_Processor_MailChimp_MCWrapper {
 				foreach ( $value as $subkey => $subvalue ) {
 					if ( 'true' === $subvalue || 'false' === $subvalue ) {
 						$subvalue = filter_var( $subvalue, FILTER_VALIDATE_BOOLEAN ); // try to force a boolean in case it is a string
-						if ( false === $subvalue ) {
+						/*if ( false === $subvalue ) {
 							$subvalue = '';
-						}
+						}*/
 					} else {
 						$subvalue = strip_tags( stripslashes( $subvalue ) );
 					}
@@ -132,7 +132,9 @@ class Form_Processor_MailChimp_MCWrapper {
 				$params[ $key ] = $value;
 			}
 		}
+
 		$result = $this->mailchimp_api->{ $method }( $call, $params );
+
 		return $result;
 	}
 
