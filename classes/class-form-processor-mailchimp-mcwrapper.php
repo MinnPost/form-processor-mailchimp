@@ -110,9 +110,10 @@ class Form_Processor_MailChimp_MCWrapper {
 		}
 
 		if ( 'POST' === $method ) {
-			$call = $call . '/' . md5( $params['email_address'] );
-			$check_user = $this->load( $call, $params );
+			$check_call = $call . '/' . md5( $params['email_address'] );
+			$check_user = $this->load( $check_call, $params );
 			if ( isset( $check_user['id'] ) ) {
+				$call = $check_call;
 				$method = 'PUT';
 			}
 		}
