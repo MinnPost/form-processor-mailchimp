@@ -114,6 +114,7 @@ class Form_Processor_MailChimp_MCWrapper {
 			$check_user = $this->load( $check_call, $params );
 			if ( isset( $check_user['id'] ) ) {
 				$call = $check_call;
+				$params['status'] = $check_user['status'];
 				$method = 'PUT';
 			}
 		}
