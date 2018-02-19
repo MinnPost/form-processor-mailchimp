@@ -111,7 +111,7 @@ class Form_Processor_MailChimp_MCWrapper {
 
 		if ( 'POST' === $method ) {
 			$check_call = $call . '/' . md5( $params['email_address'] );
-			$check_user = $this->load( $check_call, $params );
+			$check_user = $this->load( $check_call, $params, true ); // if we are checking for real, it should skip the cache
 			if ( isset( $check_user['id'] ) ) {
 				$call = $check_call;
 				$params['status'] = $check_user['status'];
