@@ -363,7 +363,7 @@ class Form_Processor_MailChimp_Admin {
 					),
 				);
 
-				if ( '' !== get_option( $this->option_prefix . 'subresource_types_' . $resource_type, '' )[ $resource_type ] ) {
+				if ( '' !== get_option( $this->option_prefix . 'subresource_types_' . $resource_type, '' ) && '' !== get_option( $this->option_prefix . 'subresource_types_' . $resource_type, '' )[ $resource_type ] ) {
 
 					$resources = get_option( $this->option_prefix . 'resources_' . $resource_type, '' )[ $resource_type ];
 					if ( '' !== $resources ) {
@@ -443,8 +443,9 @@ class Form_Processor_MailChimp_Admin {
 
 			foreach ( $resource_types as $resource_type ) {
 
-				$resources = get_option( $this->option_prefix . 'resources_' . $resource_type, '' )[ $resource_type ];
-				if ( '' !== $resources ) {
+				if ( '' !== get_option( $this->option_prefix . 'resources_' . $resource_type, '' ) && '' !== get_option( $this->option_prefix . 'resources_' . $resource_type, '' )[ $resource_type ] ) {
+
+					$resources = get_option( $this->option_prefix . 'resources_' . $resource_type, '' )[ $resource_type ];
 
 					foreach ( $resources as $resource ) {
 
