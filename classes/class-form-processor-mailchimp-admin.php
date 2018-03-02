@@ -220,6 +220,7 @@ class Form_Processor_MailChimp_Admin {
 				'args' => array(
 					'type' => 'text',
 					'desc' => '',
+					'constant' => 'FORM_PROCESSOR_MC_MAILCHIMP_API_KEY',
 				),
 			),
 			'http_methods' => array(
@@ -251,6 +252,12 @@ class Form_Processor_MailChimp_Admin {
 					'name' => $name,
 				)
 			);
+
+			// if there is a constant and it is defined, don't run a validate function if there is one
+			if ( isset( $attributes['args']['constant'] ) && defined( $attributes['args']['constant'] ) ) {
+				$validate = '';
+			}
+
 			add_settings_field( $id, $title, $callback, $page, $section, $args );
 			register_setting( $section, $id );
 		}
