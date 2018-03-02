@@ -475,9 +475,11 @@ class Form_Processor_MailChimp_Admin {
 											),
 										),
 									);
-									$subresources = get_option( $this->option_prefix . 'subresources_' . $resource . '_' . $subresource_type, array() );
 
-									if ( ! empty( $subresources ) ) {
+									if ( '' !== get_option( $this->option_prefix . 'subresources_' . $subresource_type, '' ) && '' !== get_option( $this->option_prefix . 'subresources_' . $subresource_type, '' ) ) {
+
+										$subresources = get_option( $this->option_prefix . 'subresources_' . $resource . '_' . $subresource_type, array() );
+
 										$subresource_methods = get_option( $this->option_prefix . 'subresource_methods', '' );
 
 										foreach ( $subresources[ $resource_type ][ $resource ][ $subresource_type ] as $subresource ) {
