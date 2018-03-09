@@ -85,7 +85,7 @@ class Form_Processor_MailChimp_MCWrapper {
 		if ( '' !== $method ) {
 			$allowed_items = get_option( $this->option_prefix . 'items_' . $resource . '_' . $subresource_type . '_' . $subresource . '_' . $method, false )[ $resource_type ][ $resource ][ $subresource_type ];
 			foreach ( $data[ $method ] as $key => $item ) {
-				if ( ! in_array( $item['id'], $allowed_items ) ) {
+				if ( is_array( $allowed_items ) && ! in_array( $item['id'], $allowed_items ) ) {
 					unset( $data[ $method ][ $key ] );
 				}
 			}
