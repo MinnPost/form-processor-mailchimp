@@ -37,7 +37,7 @@ class Form_Processor_MailChimp_MCWrapper {
 		$this->slug = $slug;
 		$this->wordpress = $wordpress;
 
-		$this->api_key = get_option( $this->option_prefix . 'mailchimp_api_key', '' );
+		$this->api_key = defined( 'FORM_PROCESSOR_MC_MAILCHIMP_API_KEY' ) ? FORM_PROCESSOR_MC_MAILCHIMP_API_KEY : get_option( $this->option_prefix . 'mailchimp_api_key', '' );
 
 		$this->mailchimp_api = $this->mailchimp_api();
 	}
@@ -52,6 +52,7 @@ class Form_Processor_MailChimp_MCWrapper {
 			require_once plugin_dir_path( __FILE__ ) . '../vendor/autoload.php';
 		}
 		$mailchimp_key = $this->api_key;
+		echo 'key is ' . $mailchimp_key;
 		if ( '' !== $mailchimp_key ) {
 			$mailchimp_api = new MailChimp( $mailchimp_key );
 			return $mailchimp_api;
