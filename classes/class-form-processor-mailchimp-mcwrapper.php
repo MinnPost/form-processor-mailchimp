@@ -52,7 +52,6 @@ class Form_Processor_MailChimp_MCWrapper {
 			require_once plugin_dir_path( __FILE__ ) . '../vendor/autoload.php';
 		}
 		$mailchimp_key = $this->api_key;
-		echo 'key is ' . $mailchimp_key;
 		if ( '' !== $mailchimp_key ) {
 			$mailchimp_api = new MailChimp( $mailchimp_key );
 			return $mailchimp_api;
