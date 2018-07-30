@@ -33,9 +33,9 @@ class Form_Processor_MailChimp_MCWrapper {
 	*/
 	public function __construct( $option_prefix, $version, $slug, $wordpress ) {
 		$this->option_prefix = $option_prefix;
-		$this->version = $version;
-		$this->slug = $slug;
-		$this->wordpress = $wordpress;
+		$this->version       = $version;
+		$this->slug          = $slug;
+		$this->wordpress     = $wordpress;
 
 		$this->api_key = defined( 'FORM_PROCESSOR_MC_MAILCHIMP_API_KEY' ) ? FORM_PROCESSOR_MC_MAILCHIMP_API_KEY : get_option( $this->option_prefix . 'mailchimp_api_key', '' );
 
@@ -69,16 +69,16 @@ class Form_Processor_MailChimp_MCWrapper {
 	* @return array $data
 	*/
 	public function load( $call = '', $params = array(), $reset = false ) {
-		$resource_type = isset( $params['resource_type'] ) ? $params['resource_type'] : '';
-		$resource = isset( $params['resource'] ) ? $params['resource'] : '';
+		$resource_type    = isset( $params['resource_type'] ) ? $params['resource_type'] : '';
+		$resource         = isset( $params['resource'] ) ? $params['resource'] : '';
 		$subresource_type = isset( $params['subresource_type'] ) ? $params['subresource_type'] : '';
-		$subresource = isset( $params['subresource'] ) ? $params['subresource'] : '';
-		$method = isset( $params['method'] ) ? $params['method'] : '';
-		$cached = $this->wordpress->cache_get( $call, $reset );
+		$subresource      = isset( $params['subresource'] ) ? $params['subresource'] : '';
+		$method           = isset( $params['method'] ) ? $params['method'] : '';
+		$cached           = $this->wordpress->cache_get( $call, $reset );
 		if ( is_array( $cached ) ) {
 			$data = $cached;
 		} else {
-			$data = $this->mailchimp_api->get( $call );
+			$data   = $this->mailchimp_api->get( $call );
 			$cached = $this->wordpress->cache_set( $call, $data );
 		}
 
@@ -113,9 +113,9 @@ class Form_Processor_MailChimp_MCWrapper {
 			$check_call = $call . '/' . md5( $params['email_address'] );
 			$check_user = $this->load( $check_call, $params, true ); // if we are checking for real, it should skip the cache
 			if ( isset( $check_user['id'] ) ) {
-				$call = $check_call;
+				$call             = $check_call;
 				$params['status'] = $check_user['status'];
-				$method = 'PUT';
+				$method           = 'PUT';
 			}
 		}
 
@@ -143,7 +143,7 @@ class Form_Processor_MailChimp_MCWrapper {
 			}
 		}
 
-		$result = $this->mailchimp_api->{ $method }( $call, $params );
+		$result           = $this->mailchimp_api->{ $method }( $call, $params );
 		$result['method'] = $method;
 		return $result;
 	}

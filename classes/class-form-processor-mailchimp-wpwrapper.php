@@ -29,8 +29,8 @@ class Form_Processor_MailChimp_WPWrapper {
 	public function __construct( $option_prefix, $version, $slug ) {
 
 		$this->option_prefix = $option_prefix;
-		$this->version = $version;
-		$this->slug = $slug;
+		$this->version       = $version;
+		$this->slug          = $slug;
 
 		$this->cache = true;
 
@@ -81,9 +81,9 @@ class Mailchimp_Form_Processor_WordPress_Transient {
 	 * @param string $name The name of the field that lists all cache keys.
 	 */
 	public function __construct( $name ) {
-		$this->name = $name;
+		$this->name             = $name;
 		$this->cache_expiration = 86400;
-		$this->cache_prefix = esc_sql( 'mcform_' );
+		$this->cache_prefix     = esc_sql( 'mcform_' );
 	}
 
 	/**
@@ -109,10 +109,10 @@ class Mailchimp_Form_Processor_WordPress_Transient {
 			$cache_expiration = $this->cache_expiration;
 		}
 
-		$prefix = $this->cache_prefix;
+		$prefix   = $this->cache_prefix;
 		$cachekey = $prefix . $cachekey;
 
-		$keys = $this->all_keys();
+		$keys   = $this->all_keys();
 		$keys[] = $cachekey;
 		set_transient( $this->name, $keys, $cache_expiration );
 
@@ -127,7 +127,7 @@ class Mailchimp_Form_Processor_WordPress_Transient {
 	 * @return mixed value of transient. False of empty, otherwise array.
 	 */
 	public function get( $cachekey, $reset = false ) {
-		$prefix = $this->cache_prefix;
+		$prefix   = $this->cache_prefix;
 		$cachekey = $prefix . $cachekey;
 		if ( false === $reset ) {
 			return get_transient( $cachekey );
@@ -143,7 +143,7 @@ class Mailchimp_Form_Processor_WordPress_Transient {
 	 * @return bool True if successful, false otherwise.
 	 */
 	public function delete( $cachekey ) {
-		$prefix = $this->cache_prefix;
+		$prefix   = $this->cache_prefix;
 		$cachekey = $prefix . $cachekey;
 		return delete_transient( $cachekey );
 	}
@@ -154,7 +154,7 @@ class Mailchimp_Form_Processor_WordPress_Transient {
 	 * @return bool True if successful, false otherwise.
 	 */
 	public function flush() {
-		$keys = $this->all_keys();
+		$keys   = $this->all_keys();
 		$result = true;
 		foreach ( $keys as $key ) {
 			$result = delete_transient( $key );
