@@ -490,6 +490,11 @@ class Form_Processor_MailChimp_Admin {
 										$subresource_methods = get_option( $this->option_prefix . 'subresource_methods', '' );
 
 										foreach ( $subresources[ $resource_type ][ $resource ][ $subresource_type ] as $subresource ) {
+
+											if ( ! isset( $subresource_methods[ $resource_type ][ $resource ][ $subresource_type ] ) ) {
+												continue;
+											}
+
 											foreach ( $subresource_methods[ $resource_type ][ $resource ][ $subresource_type ] as $method ) {
 												$options = $this->get_mailchimp_items( $resource_type, $resource, $subresource_type, $subresource, $method );
 												if ( ! empty( $options ) ) {
