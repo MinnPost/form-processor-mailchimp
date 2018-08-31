@@ -563,15 +563,17 @@ class Form_Processor_MailChimp_Admin {
 	private function get_mailchimp_resource_types_options() {
 		$resources = $this->mailchimp->load( '' );
 		$options   = array();
-		foreach ( $resources['_links'] as $link ) {
-			// this is where we check for supported resources. again, ideally this would go away one day.
-			if ( 'self' !== $link['rel'] && in_array( $link['rel'], $this->supported_resources ) ) {
-				$options[ $link['rel'] ] = array(
-					'text'    => ucwords( str_replace( '-', ' ', $link['rel'] ) ),
-					'id'      => $link['rel'],
-					'desc'    => '',
-					'default' => '',
-				);
+		if ( ! empty( $resources['_links'] ) ) {
+			foreach ( $resources['_links'] as $link ) {
+				// this is where we check for supported resources. again, ideally this would go away one day.
+				if ( 'self' !== $link['rel'] && in_array( $link['rel'], $this->supported_resources ) ) {
+					$options[ $link['rel'] ] = array(
+						'text'    => ucwords( str_replace( '-', ' ', $link['rel'] ) ),
+						'id'      => $link['rel'],
+						'desc'    => '',
+						'default' => '',
+					);
+				}
 			}
 		}
 		return $options;
