@@ -105,12 +105,17 @@ class Form_Processor_MailChimp_MCWrapper {
 	public function send( $call = '', $method = 'POST', $params = array() ) {
 		$result = '';
 		// this is not flexible enough for broad use, but it does work for the member update
+		// email needs to be lowercase before being hashed
+		// see: https://developer.mailchimp.com/documentation/mailchimp/guides/manage-subscribers-with-the-mailchimp-api/
+		/*
+		In previous versions of the API, we exposed internal database IDs eid and leid for emails and list/email combinations. In API 3.0, we no longer use or expose either of these IDs. Instead, we identify your subscribers by the MD5 hash of the lowercase version of their email address so you can easily predict the API URL of a subscriber’s data.
+		*/
 		if ( 'PUT' === $method && isset( $params['email_address'] ) ) {
-			$call = $call . '/' . md5( $params['email_address'] );
+			$call = $call . '/' . md5( strtolower( $params['email_address'] ) );
 		}
 
 		if ( 'POST' === $method ) {
-			$check_call = $call . '/' . md5( $params['email_address'] );
+			$check_call = $call . '/' . md5( strtolower( $params['email_address'] ) );
 			$check_user = $this->load( $check_call, $params, true ); // if we are checking for real, it should skip the cache
 			if ( isset( $check_user['id'] ) ) {
 				$call             = $check_call;
