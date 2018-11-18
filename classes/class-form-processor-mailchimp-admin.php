@@ -589,14 +589,16 @@ class Form_Processor_MailChimp_Admin {
 	private function get_mailchimp_resources_options( $resource_type ) {
 		$resources = $this->mailchimp->load( $resource_type );
 		$options   = array();
-		foreach ( $resources[ $resource_type ] as $resource ) {
-			$options[ $resource['id'] ] = array(
-				'resource_type' => $resource_type,
-				'text'          => $resource['name'],
-				'id'            => $resource['id'],
-				'desc'          => '',
-				'default'       => '',
-			);
+		if ( is_array( $resources[ $resource_type ] ) ) {
+			foreach ( $resources[ $resource_type ] as $resource ) {
+				$options[ $resource['id'] ] = array(
+					'resource_type' => $resource_type,
+					'text'          => $resource['name'],
+					'id'            => $resource['id'],
+					'desc'          => '',
+					'default'       => '',
+				);
+			}
 		}
 		return $options;
 	}
@@ -611,15 +613,17 @@ class Form_Processor_MailChimp_Admin {
 	private function get_mailchimp_subresource_type_options( $resource_type = '' ) {
 		$subresource_types = $this->mailchimp->load( $resource_type );
 		$options           = array();
-		foreach ( $subresource_types[ $resource_type ][0]['_links'] as $link ) {
-			if ( ! in_array( $link['rel'], array( 'self', 'parent', 'update', 'delete' ) ) ) {
-				$options[ $link['rel'] ] = array(
-					'resource_type' => $resource_type,
-					'text'          => ucwords( str_replace( '-', ' ', $link['rel'] ) ),
-					'id'            => $link['rel'],
-					'desc'          => '',
-					'default'       => '',
-				);
+		if ( is_array( $subresource_types[ $resource_type ][0]['_links'] ) ) {
+			foreach ( $subresource_types[ $resource_type ][0]['_links'] as $link ) {
+				if ( ! in_array( $link['rel'], array( 'self', 'parent', 'update', 'delete' ) ) ) {
+					$options[ $link['rel'] ] = array(
+						'resource_type' => $resource_type,
+						'text'          => ucwords( str_replace( '-', ' ', $link['rel'] ) ),
+						'id'            => $link['rel'],
+						'desc'          => '',
+						'default'       => '',
+					);
+				}
 			}
 		}
 		return $options;
