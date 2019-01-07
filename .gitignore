@@ -1,1 +1,10 @@
-/vendor/
+.sass-cache
+phpdoc-cache-*
+/node_modules/
+/vendor/**/.git*
+/vendor/**/.git/
+/vendor/**/.github/
+/vendor/**/test/
+/vendor/**/tests/
+# generated
+release/
