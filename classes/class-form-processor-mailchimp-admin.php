@@ -135,6 +135,10 @@ class Form_Processor_MailChimp_Admin {
 	*/
 	private function render_tabs( $tabs, $tab = '' ) {
 
+		if ( ! isset( $_GET['page'] ) || $this->slug !== $_GET['page'] ) {
+			return;
+		}
+
 		$get_data      = filter_input_array( INPUT_GET, FILTER_SANITIZE_STRING );
 		$mailchimp_api = $this->mailchimp->mailchimp_api;
 
@@ -182,15 +186,14 @@ class Form_Processor_MailChimp_Admin {
 			'link'       => $link_default,
 		);
 
-		$mailchimp_api = $this->mailchimp->mailchimp_api;
+		if ( isset( $_GET['page'] ) && $this->slug === $_GET['page'] ) {
+			$mailchimp_api = $this->mailchimp->mailchimp_api;
+		}
 
 		$this->mc_settings( 'mc_settings', 'mc_settings', $all_field_callbacks );
-
-		if ( '' !== $mailchimp_api ) {
-			$this->allowed_resources( 'allowed_resources', 'allowed_resources', $all_field_callbacks );
-			$this->resource_settings( 'resource_settings', 'resource_settings', $all_field_callbacks );
-			$this->subresource_settings( 'subresource_settings', 'subresource_settings', $all_field_callbacks );
-		}
+		$this->allowed_resources( 'allowed_resources', 'allowed_resources', $all_field_callbacks );
+		$this->resource_settings( 'resource_settings', 'resource_settings', $all_field_callbacks );
+		$this->subresource_settings( 'subresource_settings', 'subresource_settings', $all_field_callbacks );
 
 	}
 
