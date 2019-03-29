@@ -1,42 +1,30 @@
 <?php
+
 /**
- * Class file for the Form_Processor_MailChimp_Admin class.
+ * Functions specific to the administration interface
  *
- * @file
+ * @package Form_Processor_Mailchimp
  */
+class Form_Processor_Mailchimp_Admin {
 
-if ( ! class_exists( 'Form_Processor_MailChimp' ) ) {
-	die();
-}
+	public $option_prefix;
+	public $version;
+	public $slug;
+	public $mailchimp;
+	public $wordpress;
 
-/**
- * Create default WordPress admin functionality to configure the plugin.
- */
-class Form_Processor_MailChimp_Admin {
+	public $supported_resources;
 
-	protected $option_prefix;
-	protected $version;
-	protected $slug;
-	protected $mailchimp;
-	protected $wordpress;
+	private $mc_form_transients;
+	private $tabs;
 
-	/**
-	* Constructor which sets up admin pages
-	*
-	* @param string $option_prefix
-	* @param string $version
-	* @param string $slug
-	* @param object $wordpress
-	* @param object $mailchimp
-	* @throws \Exception
-	*/
-	public function __construct( $option_prefix, $version, $slug, $wordpress, $mailchimp ) {
+	public function __construct() {
 
-		$this->option_prefix = $option_prefix;
-		$this->version       = $version;
-		$this->slug          = $slug;
-		$this->wordpress     = $wordpress;
-		$this->mailchimp     = $mailchimp;
+		$this->option_prefix = form_processor_mailchimp()->option_prefix;
+		$this->version       = form_processor_mailchimp()->version;
+		$this->slug          = form_processor_mailchimp()->slug;
+		$this->wordpress     = form_processor_mailchimp()->wordpress;
+		$this->mailchimp     = form_processor_mailchimp()->mailchimp;
 
 		// the plugin doesn't support everything in the api, so let's not pretend it does
 		// ideally it should eventually go away though
@@ -52,17 +40,12 @@ class Form_Processor_MailChimp_Admin {
 
 	}
 
-	/**
-	* Create the action hooks to create the admin page(s)
-	*
-	*/
-	public function add_actions() {
+	private function add_actions() {
 		if ( is_admin() ) {
 			add_action( 'admin_menu', array( $this, 'create_admin_menu' ) );
 			add_action( 'admin_init', array( $this, 'admin_settings_form' ) );
-			add_action( 'plugins_loaded', array( $this, 'textdomain' ) );
+			add_filter( 'plugin_action_links', array( $this, 'plugin_action_links' ), 10, 2 );
 		}
-
 	}
 
 	/**
@@ -564,8 +547,11 @@ class Form_Processor_MailChimp_Admin {
 	*
 	*/
 	private function get_mailchimp_resource_types_options() {
+		$options = array();
+		if ( ! isset( $_GET['page'] ) || $this->slug !== $_GET['page'] ) {
+			return;
+		}
 		$resources = $this->mailchimp->load( '' );
-		$options   = array();
 		if ( ! empty( $resources['_links'] ) ) {
 			foreach ( $resources['_links'] as $link ) {
 				// this is where we check for supported resources. again, ideally this would go away one day.
@@ -590,8 +576,11 @@ class Form_Processor_MailChimp_Admin {
 	*
 	*/
 	private function get_mailchimp_resources_options( $resource_type ) {
+		$options = array();
+		if ( ! isset( $_GET['page'] ) || $this->slug !== $_GET['page'] ) {
+			return;
+		}
 		$resources = $this->mailchimp->load( $resource_type );
-		$options   = array();
 		if ( is_array( $resources[ $resource_type ] ) ) {
 			foreach ( $resources[ $resource_type ] as $resource ) {
 				$options[ $resource['id'] ] = array(
@@ -614,8 +603,11 @@ class Form_Processor_MailChimp_Admin {
 	*
 	*/
 	private function get_mailchimp_subresource_type_options( $resource_type = '' ) {
+		$options = array();
+		if ( ! isset( $_GET['page'] ) || $this->slug !== $_GET['page'] ) {
+			return;
+		}
 		$subresource_types = $this->mailchimp->load( $resource_type );
-		$options           = array();
 		if ( is_array( $subresource_types[ $resource_type ][0]['_links'] ) ) {
 			foreach ( $subresource_types[ $resource_type ][0]['_links'] as $link ) {
 				if ( ! in_array( $link['rel'], array( 'self', 'parent', 'update', 'delete' ) ) ) {
@@ -642,8 +634,11 @@ class Form_Processor_MailChimp_Admin {
 	*
 	*/
 	private function get_mailchimp_subresource_options( $resource_type, $resource_id, $subresource_type ) {
+		$options = array();
+		if ( ! isset( $_GET['page'] ) || $this->slug !== $_GET['page'] ) {
+			return;
+		}
 		$subresources = $this->mailchimp->load( $resource_type . '/' . $resource_id . '/' . $subresource_type );
-		$options      = array();
 
 		$key = $subresource_type;
 		if ( ! isset( $subresources[ $key ] ) ) {
@@ -711,8 +706,12 @@ class Form_Processor_MailChimp_Admin {
 	*/
 	private function get_mailchimp_method_options( $resource_type = '', $resource = '', $subresource_type = '' ) {
 
-		$methods = $this->mailchimp->load( $resource_type . '/' . $resource . '/' . $subresource_type );
 		$options = array();
+		if ( ! isset( $_GET['page'] ) || $this->slug !== $_GET['page'] ) {
+			return;
+		}
+
+		$methods = $this->mailchimp->load( $resource_type . '/' . $resource . '/' . $subresource_type );
 
 		$key = $subresource_type;
 		if ( ! isset( $methods[ $key ] ) ) {
@@ -759,9 +758,12 @@ class Form_Processor_MailChimp_Admin {
 	*/
 	private function get_mailchimp_items( $resource_type = '', $resource = '', $subresource_type = '', $subresource = '', $method = '' ) {
 
-		$items = $this->mailchimp->load( $resource_type . '/' . $resource . '/' . $subresource_type . '/' . $subresource . '/' . $method );
-
 		$options = array();
+		if ( ! isset( $_GET['page'] ) || $this->slug !== $_GET['page'] ) {
+			return;
+		}
+
+		$items = $this->mailchimp->load( $resource_type . '/' . $resource . '/' . $subresource_type . '/' . $subresource . '/' . $method );
 
 		$key = $method;
 		if ( ! isset( $items[ $key ] ) ) {
@@ -785,7 +787,26 @@ class Form_Processor_MailChimp_Admin {
 		return $options;
 	}
 
+	/**
+	* Display a Settings link on the main Plugins page
+	*
+	* @param array $links
+	* @param string $file
+	* @return array $links
+	*   These are the links that go with this plugin's entry
+	*/
+	public function plugin_action_links( $links, $file ) {
+		if ( plugin_basename( FORM_PROCESSOR_MAILCHIMP_FILE ) === $file ) {
+			array_unshift( $links, sprintf(
+				'<a href="%1$s">%2$s</a>',
+				form_processor_mailchimp()->get_menu_url(),
+				__( 'Settings', 'form-processor-mailchimp' )
+			) );
+		} // End if()
+		return $links;
+	}
 
+	// * form fields * //
 	/**
 	* Default display for <input> fields
 	*
@@ -1016,14 +1037,4 @@ class Form_Processor_MailChimp_Admin {
 		}
 
 	}
-
-	/**
-	 * Load textdomain
-	 *
-	 * @return void
-	 */
-	public function textdomain() {
-		load_plugin_textdomain( 'form-processor-mailchimp', false, dirname( plugin_basename( __FILE__ ) ) . '/languages/' );
-	}
-
 }

@@ -1,47 +1,29 @@
 <?php
+
 /**
- * Class file for the Form_Processor_MailChimp_Processor class.
+ * Form processing
  *
- * @file
+ * @package Form_Processor_Mailchimp
  */
+class Form_Processor_Mailchimp_Processor {
 
-if ( ! class_exists( 'Form_Processor_MailChimp' ) ) {
-	die();
-}
+	public $option_prefix;
+	public $version;
+	public $slug;
+	public $namespace;
+	public $api_version;
+	public $wordpress;
+	public $mailchimp;
 
-/**
- * Form processor
- */
-class Form_Processor_MailChimp_Processor {
+	public function __construct() {
 
-	protected $option_prefix;
-	protected $version;
-	protected $slug;
-	protected $namespace;
-	protected $api_version;
-	protected $wordpress;
-	protected $mailchimp;
-
-	/**
-	* Constructor which sets up admin pages
-	*
-	* @param string $option_prefix
-	* @param string $version
-	* @param string $slug
-	* @param string $namespace
-	* @param string $api_version
-	* @param object $wordpress
-	* @param object $mailchimp
-	* @throws \Exception
-	*/
-	public function __construct( $option_prefix, $version, $slug, $namespace, $api_version, $wordpress, $mailchimp ) {
-		$this->option_prefix = $option_prefix;
-		$this->version       = $version;
-		$this->slug          = $slug;
-		$this->namespace     = $namespace;
-		$this->api_version   = $api_version;
-		$this->wordpress     = $wordpress;
-		$this->mailchimp     = $mailchimp;
+		$this->option_prefix = form_processor_mailchimp()->option_prefix;
+		$this->version       = form_processor_mailchimp()->version;
+		$this->slug          = form_processor_mailchimp()->slug;
+		$this->namespace     = form_processor_mailchimp()->namespace;
+		$this->api_version   = form_processor_mailchimp()->api_version;
+		$this->wordpress     = form_processor_mailchimp()->wordpress;
+		$this->mailchimp     = form_processor_mailchimp()->mailchimp;
 
 		$this->init();
 	}

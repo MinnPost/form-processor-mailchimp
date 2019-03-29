@@ -2,7 +2,7 @@
 /*
 Plugin Name: Form Processor for MailChimp
 Description: This plugin processes a form that has been submitted to it, and integrates with the MailChimp API.
-Version: 0.0.5
+Version: 0.0.6
 Author: Jonathan Stegall
 Author URI: https://code.minnpost.com
 Text Domain: form-processor-mailchimp
@@ -10,179 +10,75 @@ License: GPL2+
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 */
 
-class Form_Processor_MailChimp {
+/* Exit if accessed directly */
+if ( ! defined( 'ABSPATH' ) ) {
+	return;
+}
 
-	/**
-	* @var string
-	* The plugin version
-	*/
-	private $version;
+/**
+ * The full path to the main file of this plugin
+ *
+ * This can later be passed to functions such as
+ * plugin_dir_path(), plugins_url() and plugin_basename()
+ * to retrieve information about plugin paths
+ *
+ * @since 0.0.6
+ * @var string
+ */
+define( 'FORM_PROCESSOR_MAILCHIMP_FILE', __FILE__ );
 
-	/**
-	* @var string
-	* The REST API namespace
-	*/
-	private $namespace;
+/**
+ * The plugin's current version
+ *
+ * @since 0.0.6
+ * @var string
+ */
+define( 'FORM_PROCESSOR_MAILCHIMP_VERSION', '0.0.6' );
 
-	/**
-	* @var int
-	* The REST API version
-	*/
-	private $api_version;
+/**
+ * Enable autoloading of plugin classes
+ * @param $class_name
+ */
+function form_processor_mailchimp_autoload( $class_name ) {
 
-	/**
-	* @var string
-	* The plugin's prefix for saving options
-	*/
-	protected $option_prefix;
-
-	/**
-	* @var object
-	* Load and initialize the Form_Processor_MailChimp_WPWrapper class
-	*/
-	protected $wordpress;
-
-	/**
-	* @var object
-	* Load and initialize the Form_Processor_MailChimp_MCWrapper class
-	*/
-	protected $mailchimp;
-
-	/**
-	* @var object
-	* Load and initialize the Form_Processor_MailChimp_Processor class
-	*/
-	protected $processor;
-
-	/**
-	* @var object
-	* Load and initialize the Form_Processor_MailChimp_Admin class
-	*/
-	public $admin;
-
-	/**
-	 * @var object
-	 * Static property to hold an instance of the class; this seems to make it reusable
-	 *
-	 */
-	static $instance = null;
-
-	/**
-	* Load the static $instance property that holds the instance of the class.
-	* This instance makes the class reusable by other plugins
-	*
-	* @return object
-	*   The sfapi object if it is authenticated (empty, otherwise)
-	*
-	*/
-	static public function get_instance() {
-		if ( null === self::$instance ) {
-			self::$instance = new Form_Processor_MailChimp();
-		}
-		return self::$instance;
+	// Only autoload classes from this plugin
+	if ( 'Form_Processor_MailChimp' !== $class_name && 0 !== strpos( $class_name, 'Form_Processor_Mailchimp_' ) ) {
+		return;
 	}
 
-	/**
-	 * This is our constructor
-	 *
-	 * @return void
-	 */
-	public function __construct() {
+	// wpcs style filename for each class
+	$file_name = 'class-' . str_replace( '_', '-', strtolower( $class_name ) );
 
-		$this->version = '0.0.5';
-		$this->slug    = 'form-processor-mailchimp';
+	// create file path
+	$file = dirname( FORM_PROCESSOR_MAILCHIMP_FILE ) . '/php/' . $file_name . '.php';
 
-		//The namespace and version for the REST SERVER
-		$this->namespace   = 'form-processor-mc/v';
-		$this->api_version = '1';
-
-		$this->option_prefix = 'form_process_mc_';
-
-		// when plugins are loaded, start loading classes
-		add_action( 'plugins_loaded', array( $this, 'load_classes' ) );
-
-	}
-
-	/**
-	* Don't load any classes, including the requirement for the MailChimp API wrapper, until plugins_loaded has fired.
-	*
-	*/
-	public function load_classes() {
-		// WordPress wrapper
-		$this->wordpress = $this->wordpress();
-
-		// MailChimp wrapper
-		$this->mailchimp = $this->mailchimp();
-
-		// form processor
-		$this->processor = $this->processor();
-
-		// admin settings
-		$this->admin = $this->load_admin();
-	}
-
-	/**
-	 * WordPress wrapper. Includes caching.
-	 *
-	 * @return object $wordpress
-	 */
-	private function wordpress() {
-		require_once( plugin_dir_path( __FILE__ ) . 'classes/class-form-processor-mailchimp-wpwrapper.php' );
-		$wordpress = new Form_Processor_MailChimp_WPWrapper( $this->option_prefix, $this->version, $this->slug );
-		return $wordpress;
-	}
-
-	/**
-	 * MailChimp API wrapper
-	 *
-	 * @return object $mailchimp
-	 */
-	private function mailchimp() {
-		require_once( plugin_dir_path( __FILE__ ) . 'classes/class-form-processor-mailchimp-mcwrapper.php' );
-		$mailchimp = new Form_Processor_MailChimp_MCWrapper( $this->option_prefix, $this->version, $this->slug, $this->wordpress );
-		return $mailchimp;
-	}
-
-	/**
-	 * REST API processor. Handles API requests.
-	 *
-	 * @return object $processor
-	 */
-	private function processor() {
-		require_once( plugin_dir_path( __FILE__ ) . 'classes/class-form-processor-mailchimp-processor.php' );
-		$processor = new Form_Processor_MailChimp_Processor( $this->option_prefix, $this->version, $this->slug, $this->namespace, $this->api_version, $this->wordpress, $this->mailchimp );
-		return $processor;
-	}
-
-	/**
-	 * Plugin admin
-	 *
-	 * @return object $admin
-	 */
-	public function load_admin() {
-		require_once( plugin_dir_path( __FILE__ ) . 'classes/class-form-processor-mailchimp-admin.php' );
-		$admin = new Form_Processor_MailChimp_Admin( $this->option_prefix, $this->version, $this->slug, $this->wordpress, $this->mailchimp );
-		add_filter( 'plugin_action_links', array( $this, 'plugin_action_links' ), 10, 2 );
-		return $admin;
-	}
-
-	/**
-	* Display a Settings link on the main Plugins page
-	*
-	* @param array $links
-	* @param string $file
-	* @return array $links
-	* These are the links that go with this plugin's entry
-	*/
-	public function plugin_action_links( $links, $file ) {
-		if ( plugin_basename( __FILE__ ) === $file ) {
-			$settings = '<a href="' . get_admin_url() . 'options-general.php?page=form-processor-mailchimp">' . __( 'Settings', 'form-processor-mailchimp' ) . '</a>';
-			array_unshift( $links, $settings );
-		}
-		return $links;
+	// If a file is found, load it
+	if ( file_exists( $file ) ) {
+		require_once( $file );
 	}
 
 }
 
-// Instantiate our class
-$form_processor_mailchimp = Form_Processor_MailChimp::get_instance();
+try {
+	spl_autoload_register( 'form_processor_mailchimp_autoload' );
+} catch ( Exception $e ) {
+	new WP_Error( $e->getCode(), $e->getMessage() );
+}
+
+/**
+ * Retrieve the instance of the main plugin class
+ *
+ * @since 2.6.0
+ * @return Code_Snippets
+ */
+function form_processor_mailchimp() {
+	static $plugin;
+
+	if ( is_null( $plugin ) ) {
+		$plugin = new Form_Processor_MailChimp( FORM_PROCESSOR_MAILCHIMP_VERSION, __FILE__ );
+	}
+
+	return $plugin;
+}
+
+form_processor_mailchimp()->init();
