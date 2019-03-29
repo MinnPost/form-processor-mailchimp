@@ -69,7 +69,7 @@ try {
  * Retrieve the instance of the main plugin class
  *
  * @since 2.6.0
- * @return Code_Snippets
+ * @return Form_Processor_Mailchimp
  */
 function form_processor_mailchimp() {
 	static $plugin;

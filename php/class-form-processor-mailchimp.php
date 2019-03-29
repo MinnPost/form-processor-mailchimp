@@ -57,7 +57,6 @@ class Form_Processor_Mailchimp {
 
 		add_action( 'plugins_loaded', array( $this, 'load_textdomain' ) );
 
-		//add_filter( 'code_snippets/execute_snippets', array( $this, 'disable_snippet_execution' ), 5 );
 	}
 
 	public function init() {
@@ -70,7 +69,7 @@ class Form_Processor_Mailchimp {
 		$this->mailchimp = new Form_Processor_Mailchimp_MC();
 
 		// Form Processor
-		//$this->processor = new Form_Processor_Mailchimp_Processor();
+		$this->processor = new Form_Processor_Mailchimp_Processor();
 
 		// Admin features
 		$this->admin = new Form_Processor_Mailchimp_Admin();
