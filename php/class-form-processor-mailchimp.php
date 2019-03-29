@@ -25,19 +25,28 @@ class Form_Processor_Mailchimp {
 	public $file;
 
 	/**
-	 * @var Code_Snippets_DB
+	 * Prefix for plugin options
+	 * @var string
 	 */
-	public $db;
+	public $option_prefix;
 
 	/**
-	 * @var Code_Snippets_Admin
+	 * Plugin slug
+	 * @var string
 	 */
-	public $admin;
+	public $slug;
 
 	/**
-	 * @var Code_Snippets_Shortcode
+	 * Plugin API namespace
+	 * @var string
 	 */
-	public $shortcode;
+	public $namespace;
+
+	/**
+	 * Plugin API version
+	 * @var string
+	 */
+	public $api_version;
 
 	/**
 	 * Class constructor
