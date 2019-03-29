@@ -1,7 +1,7 @@
 <?php
 
 /**
- * WordPress wrapper
+ * WordPress feature wrapper
  *
  * @package Form_Processor_Mailchimp
  */

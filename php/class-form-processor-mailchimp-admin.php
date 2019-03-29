@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Functions specific to the administration interface
+ * Administrative interface features
  *
  * @package Form_Processor_Mailchimp
  */

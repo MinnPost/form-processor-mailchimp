@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Form processing
+ * Form processor
  *
  * @package Form_Processor_Mailchimp
  */

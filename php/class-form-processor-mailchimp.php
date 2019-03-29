@@ -49,6 +49,30 @@ class Form_Processor_Mailchimp {
 	public $api_version;
 
 	/**
+	 * WordPress feature wrapper
+	 * @var object
+	 */
+	public $wordpress;
+
+	/**
+	 * MailChimp feature/API wrapper
+	 * @var object
+	 */
+	public $mailchimp;
+
+	/**
+	 * Form processor
+	 * @var object
+	 */
+	public $processor;
+
+	/**
+	 * Administrative interface features
+	 * @var object
+	 */
+	public $admin;
+
+	/**
 	 * Class constructor
 	 *
 	 * @param string $version The current plugin version

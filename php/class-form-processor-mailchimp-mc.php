@@ -1,7 +1,7 @@
 <?php
 
 /**
- * MailChimp wrapper
+ * MailChimp feature/API wrapper
  *
  * @package Form_Processor_Mailchimp
  */
