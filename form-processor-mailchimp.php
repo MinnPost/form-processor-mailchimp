@@ -35,35 +35,8 @@ define( 'FORM_PROCESSOR_MAILCHIMP_FILE', __FILE__ );
  */
 define( 'FORM_PROCESSOR_MAILCHIMP_VERSION', '0.0.6' );
 
-/**
- * Enable autoloading of plugin classes
- * @param $class_name
- */
-function form_processor_mailchimp_autoload( $class_name ) {
-
-	// Only autoload classes from this plugin
-	if ( 'Form_Processor_MailChimp' !== $class_name && 0 !== strpos( $class_name, 'Form_Processor_Mailchimp_' ) ) {
-		return;
-	}
-
-	// wpcs style filename for each class
-	$file_name = 'class-' . str_replace( '_', '-', strtolower( $class_name ) );
-
-	// create file path
-	$file = dirname( FORM_PROCESSOR_MAILCHIMP_FILE ) . '/php/' . $file_name . '.php';
-
-	// If a file is found, load it
-	if ( file_exists( $file ) ) {
-		require_once( $file );
-	}
-
-}
-
-try {
-	spl_autoload_register( 'form_processor_mailchimp_autoload' );
-} catch ( Exception $e ) {
-	new WP_Error( $e->getCode(), $e->getMessage() );
-}
+// Load the autoloader.
+require_once( 'lib/autoloader.php' );
 
 /**
  * Retrieve the instance of the main plugin class
