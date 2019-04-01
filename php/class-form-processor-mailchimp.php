@@ -78,7 +78,7 @@ class Form_Processor_Mailchimp {
 	 * @param string $version The current plugin version
 	 * @param string $file The main plugin file
 	 */
-	function __construct( $version, $file ) {
+	public function __construct( $version, $file ) {
 		$this->version       = $version;
 		$this->file          = $file;
 		$this->option_prefix = 'form_process_mc_';
