@@ -1,41 +1,27 @@
 <?php
+
 /**
- * Class file for the Form_Processor_MailChimp_WPWrapper class.
+ * WordPress feature wrapper
  *
- * @file
+ * @package Form_Processor_Mailchimp
  */
+class Form_Processor_Mailchimp_WP {
 
-if ( ! class_exists( 'Form_Processor_MailChimp' ) ) {
-	die();
-}
+	public $option_prefix;
+	public $version;
+	public $slug;
 
-/**
- * Create default WordPress functionality to configure the plugin.
- */
-class Form_Processor_MailChimp_WPWrapper {
+	public $cache;
+	public $mc_form_transients;
 
-	protected $option_prefix;
-	protected $version;
-	protected $slug;
+	public function __construct() {
 
-	/**
-	* Constructor which sets up WordPress methods
-	*
-	* @param string $option_prefix
-	* @param string $version
-	* @param string $slug
-	* @throws \Exception
-	*/
-	public function __construct( $option_prefix, $version, $slug ) {
+		$this->option_prefix = form_processor_mailchimp()->option_prefix;
+		$this->version       = form_processor_mailchimp()->version;
+		$this->slug          = form_processor_mailchimp()->slug;
 
-		$this->option_prefix = $option_prefix;
-		$this->version       = $version;
-		$this->slug          = $slug;
-
-		$this->cache = true;
-
+		$this->cache              = true;
 		$this->mc_form_transients = new Mailchimp_Form_Processor_WordPress_Transient( 'mc_form_transients' );
-
 	}
 
 	/**
@@ -62,7 +48,6 @@ class Form_Processor_MailChimp_WPWrapper {
 		$cachekey = md5( wp_json_encode( $call ) );
 		return $this->mc_form_transients->set( $cachekey, $data );
 	}
-
 }
 
 /**

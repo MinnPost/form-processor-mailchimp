@@ -1,44 +1,30 @@
 <?php
-/**
- * Class file for the Form_Processor_MailChimp_MCWrapper class.
- *
- * @file
- */
 
-if ( ! class_exists( 'Form_Processor_MailChimp' ) ) {
-	die();
-}
+/**
+ * MailChimp feature/API wrapper
+ *
+ * @package Form_Processor_Mailchimp
+ */
 
 use \DrewM\MailChimp\MailChimp;
-/**
- * Mailchimp wrapper
- */
-class Form_Processor_MailChimp_MCWrapper {
 
-	protected $option_prefix;
-	protected $version;
-	protected $slug;
-	protected $wordpress;
+class Form_Processor_Mailchimp_MC {
+
+	public $option_prefix;
+	public $version;
+	public $slug;
+	public $wordpress;
 
 	public $api_key;
 
-	/**
-	* Constructor which sets up admin pages
-	*
-	* @param string $option_prefix
-	* @param string $version
-	* @param string $slug
-	* @param object $wordpress
-	* @throws \Exception
-	*/
-	public function __construct( $option_prefix, $version, $slug, $wordpress ) {
-		$this->option_prefix = $option_prefix;
-		$this->version       = $version;
-		$this->slug          = $slug;
-		$this->wordpress     = $wordpress;
+	public function __construct() {
 
-		$this->api_key = defined( 'FORM_PROCESSOR_MC_MAILCHIMP_API_KEY' ) ? FORM_PROCESSOR_MC_MAILCHIMP_API_KEY : get_option( $this->option_prefix . 'mailchimp_api_key', '' );
+		$this->option_prefix = form_processor_mailchimp()->option_prefix;
+		$this->version       = form_processor_mailchimp()->version;
+		$this->slug          = form_processor_mailchimp()->slug;
+		$this->wordpress     = form_processor_mailchimp()->wordpress;
 
+		$this->api_key       = defined( 'FORM_PROCESSOR_MC_MAILCHIMP_API_KEY' ) ? FORM_PROCESSOR_MC_MAILCHIMP_API_KEY : get_option( $this->option_prefix . 'mailchimp_api_key', '' );
 		$this->mailchimp_api = $this->mailchimp_api();
 	}
 
@@ -188,5 +174,4 @@ class Form_Processor_MailChimp_MCWrapper {
 			return $result['title'];
 		}
 	}
-
 }

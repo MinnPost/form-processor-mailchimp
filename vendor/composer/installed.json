@@ -6,23 +6,24 @@
         "source": {
             "type": "git",
             "url": "https://github.com/drewm/mailchimp-api.git",
-            "reference": "e3febc93dbe8047f0a14fea19c1efe79cecc7e98"
+            "reference": "a6519cafba509e754e748d93f3532ad7f3aa515a"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/drewm/mailchimp-api/zipball/e3febc93dbe8047f0a14fea19c1efe79cecc7e98",
-            "reference": "e3febc93dbe8047f0a14fea19c1efe79cecc7e98",
+            "url": "https://api.github.com/repos/drewm/mailchimp-api/zipball/a6519cafba509e754e748d93f3532ad7f3aa515a",
+            "reference": "a6519cafba509e754e748d93f3532ad7f3aa515a",
             "shasum": ""
         },
         "require": {
             "ext-curl": "*",
+            "ext-json": "*",
             "php": ">=5.3"
         },
         "require-dev": {
             "phpunit/phpunit": "7.0.*",
             "vlucas/phpdotenv": "^2.0"
         },
-        "time": "2018-02-23T09:45:38+00:00",
+        "time": "2019-03-28T15:20:43+00:00",
         "type": "library",
         "installation-source": "source",
         "autoload": {
