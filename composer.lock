@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ee5506f516d79d23ede0e6a340c47720",
+    "content-hash": "58fd7dde062500357cf38319fd423126",
     "packages": [
         {
             "name": "drewm/mailchimp-api",
@@ -49,16 +49,50 @@
             "description": "Super-simple, minimum abstraction MailChimp API v3 wrapper",
             "homepage": "https://github.com/drewm/mailchimp-api",
             "time": "2019-03-28T15:20:43+00:00"
+        },
+        {
+            "name": "pippinsplugins/wp-logging",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/pippinsplugins/wp-logging.git",
+                "reference": "766d745886093fae88788107e190aff41b1db61b"
+            },
+            "require": {
+                "php": ">=5.2.0"
+            },
+            "type": "library",
+            "license": [
+                "GPL-2.0+"
+            ],
+            "authors": [
+                {
+                    "name": "Pippin Williamson"
+                }
+            ],
+            "description": "A WordPress class that provides a general logging system.",
+            "homepage": "https://github.com/pippinsplugins/WP-Logging",
+            "keywords": [
+                "log",
+                "logger",
+                "logging",
+                "wordpress"
+            ],
+            "time": "2016-04-08T18:01:49+00:00"
         }
     ],
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "dev",
     "stability-flags": {
-        "drewm/mailchimp-api": 20
+        "drewm/mailchimp-api": 20,
+        "pippinsplugins/wp-logging": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": [],
-    "platform-dev": []
+    "platform-dev": [],
+    "platform-overrides": {
+        "php": "5.6.20"
+    }
 }

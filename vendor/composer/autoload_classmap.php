@@ -6,4 +6,5 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
+    'WP_Logging' => $vendorDir . '/pippinsplugins/wp-logging/WP_Logging.php',
 );

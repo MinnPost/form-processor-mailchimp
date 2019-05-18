@@ -44,5 +44,37 @@
         ],
         "description": "Super-simple, minimum abstraction MailChimp API v3 wrapper",
         "homepage": "https://github.com/drewm/mailchimp-api"
+    },
+    {
+        "name": "pippinsplugins/wp-logging",
+        "version": "dev-master",
+        "version_normalized": "9999999-dev",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/pippinsplugins/wp-logging.git",
+            "reference": "766d745886093fae88788107e190aff41b1db61b"
+        },
+        "require": {
+            "php": ">=5.2.0"
+        },
+        "time": "2016-04-08T18:01:49+00:00",
+        "type": "library",
+        "installation-source": "source",
+        "license": [
+            "GPL-2.0+"
+        ],
+        "authors": [
+            {
+                "name": "Pippin Williamson"
+            }
+        ],
+        "description": "A WordPress class that provides a general logging system.",
+        "homepage": "https://github.com/pippinsplugins/WP-Logging",
+        "keywords": [
+            "log",
+            "logger",
+            "logging",
+            "wordpress"
+        ]
     }
 ]
