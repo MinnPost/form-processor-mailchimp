@@ -23,6 +23,7 @@ class Form_Processor_Mailchimp_MC {
 		$this->version       = form_processor_mailchimp()->version;
 		$this->slug          = form_processor_mailchimp()->slug;
 		$this->wordpress     = form_processor_mailchimp()->wordpress;
+		$this->logging       = form_processor_mailchimp()->logging;
 
 		$this->api_key       = defined( 'FORM_PROCESSOR_MC_MAILCHIMP_API_KEY' ) ? FORM_PROCESSOR_MC_MAILCHIMP_API_KEY : get_option( $this->option_prefix . 'mailchimp_api_key', '' );
 		$this->mailchimp_api = $this->mailchimp_api();
@@ -66,6 +67,35 @@ class Form_Processor_Mailchimp_MC {
 		} else {
 			$data   = $this->mailchimp_api->get( $call );
 			$cached = $this->wordpress->cache_set( $call, $data );
+			// create log entry if there is an error
+			if ( isset( $data['status'] ) ) {
+				$log_status = $data['status'];
+				$log_title  = sprintf(
+					// translators: placeholders are: 1) the server error code
+					esc_html__( 'MailChimp: %1$s on Load request', 'form-processor-mailchimp' ),
+					absint( $log_status )
+				);
+
+				$log_message = sprintf(
+					// translators: placeholders are: 1) api call, 2) params array, 3) reset flag, 4) api result
+					esc_html__( 'Load call was %1$s, params array is %2$s, reset is %3$s, result is %4$s.', 'form-processor-mailchimp' ),
+					esc_html( $call ),
+					print_r( $params, true ),
+					esc_attr( $reset ),
+					print_r( $data, true ),
+					is_array( $cached )
+				);
+
+				$log_entry = array(
+					'title'   => $log_title,
+					'message' => $log_message,
+					'trigger' => 0,
+					'parent'  => '',
+					'status'  => $log_status,
+				);
+
+				$this->logging->setup( $log_entry );
+			}
 		}
 
 		if ( '' !== $method ) {
@@ -138,6 +168,37 @@ class Form_Processor_Mailchimp_MC {
 
 		$result           = $this->mailchimp_api->{ $method }( $call, $params );
 		$result['method'] = $method;
+
+		// create log entry if there is an error
+		if ( isset( $result['status'] ) ) {
+			$log_status = $result['status'];
+			$log_title  = sprintf(
+				// translators: placeholders are: 1) the server error code, 2) what method was called
+				esc_html__( 'MailChimp: %1$s on %2$s send request', 'form-processor-mailchimp' ),
+				absint( $log_status )
+			);
+
+			$log_message = sprintf(
+				// translators: placeholders are: 1) api call, 2) method, 3) params array, 4) reset flag, 5) api result
+				esc_html__( 'Send call was %1$s, method was %2$s, params array is %3$s, reset is %4$s, result is %5$s.', 'form-processor-mailchimp' ),
+				esc_html( $call ),
+				esc_attr( $method ),
+				print_r( $params, true ),
+				esc_attr( $reset ),
+				print_r( $result, true )
+			);
+
+			$log_entry = array(
+				'title'   => $log_title,
+				'message' => $log_message,
+				'trigger' => 0,
+				'parent'  => '',
+				'status'  => $log_status,
+			);
+
+			$this->logging->setup( $log_entry );
+		}
+
 		return $result;
 	}
 
