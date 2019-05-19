@@ -20,11 +20,16 @@ class ComposerStaticInit21b3da84e2aa30e9f6a39651918c1c3c
         ),
     );
 
+    public static $classMap = array (
+        'WP_Logging' => __DIR__ . '/..' . '/pippinsplugins/wp-logging/WP_Logging.php',
+    );
+
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
             $loader->prefixLengthsPsr4 = ComposerStaticInit21b3da84e2aa30e9f6a39651918c1c3c::$prefixLengthsPsr4;
             $loader->prefixDirsPsr4 = ComposerStaticInit21b3da84e2aa30e9f6a39651918c1c3c::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInit21b3da84e2aa30e9f6a39651918c1c3c::$classMap;
 
         }, null, ClassLoader::class);
     }

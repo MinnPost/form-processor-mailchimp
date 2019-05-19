@@ -49,6 +49,12 @@ class Form_Processor_Mailchimp {
 	public $api_version;
 
 	/**
+	 * WP Logging implementation
+	 * @var object
+	 */
+	public $logging;
+
+	/**
 	 * WordPress feature wrapper
 	 * @var object
 	 */
@@ -94,6 +100,9 @@ class Form_Processor_Mailchimp {
 
 	public function init() {
 		//$includes_path = dirname( __FILE__ );
+
+		// Logging features
+		$this->logging = new Form_Processor_Mailchimp_Logging();
 
 		// WordPress features
 		$this->wordpress = new Form_Processor_Mailchimp_WP();

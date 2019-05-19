@@ -65,10 +65,11 @@ class Form_Processor_Mailchimp_Admin {
 	*/
 	private function get_admin_tabs() {
 		$tabs = array(
-			'mc_settings'          => 'MailChimp Settings',
-			'allowed_resources'    => 'Allowed Resources',
-			'resource_settings'    => 'Resource Settings',
-			'subresource_settings' => 'Subresource Settings',
+			'mc_settings'          => __( 'MailChimp Settings', 'form-processor-mailchimp' ),
+			'allowed_resources'    => __( 'Allowed Resources', 'form-processor-mailchimp' ),
+			'resource_settings'    => __( 'Resource Settings', 'form-processor-mailchimp' ),
+			'subresource_settings' => __( 'Subresource Settings', 'form-processor-mailchimp' ),
+			'mc_log_settings'      => __( 'Log Settings', 'form-processor-mailchimp' ),
 		); // this creates the tabs for the admin
 		return $tabs;
 	}
@@ -88,24 +89,7 @@ class Form_Processor_Mailchimp_Admin {
 			$tabs = $this->tabs;
 			$tab  = isset( $get_data['tab'] ) ? sanitize_key( $get_data['tab'] ) : 'mc_settings';
 			$this->render_tabs( $tabs, $tab );
-
-			switch ( $tab ) {
-				case 'mc_settings':
-					require_once( plugin_dir_path( __FILE__ ) . '/../templates/admin/settings.php' );
-					break;
-				case 'allowed_resources':
-					require_once( plugin_dir_path( __FILE__ ) . '/../templates/admin/settings.php' );
-					break;
-				case 'resource_settings':
-					require_once( plugin_dir_path( __FILE__ ) . '/../templates/admin/settings.php' );
-					break;
-				case 'subresource_settings':
-					require_once( plugin_dir_path( __FILE__ ) . '/../templates/admin/settings.php' );
-					break;
-				default:
-					require_once( plugin_dir_path( __FILE__ ) . '/../templates/admin/settings.php' );
-					break;
-			} // End switch().
+			require_once( plugin_dir_path( __FILE__ ) . '/../templates/admin/settings.php' );
 			?>
 		</div>
 		<?php
@@ -177,6 +161,7 @@ class Form_Processor_Mailchimp_Admin {
 		$this->allowed_resources( 'allowed_resources', 'allowed_resources', $all_field_callbacks );
 		$this->resource_settings( 'resource_settings', 'resource_settings', $all_field_callbacks );
 		$this->subresource_settings( 'subresource_settings', 'subresource_settings', $all_field_callbacks );
+		$this->mc_log_settings( 'mc_log_settings', 'mc_log_settings', $all_field_callbacks );
 
 	}
 
@@ -538,6 +523,147 @@ class Form_Processor_Mailchimp_Admin {
 			}
 		}
 
+	}
+
+	/**
+	* Fields for the Log Settings tab
+	* This runs add_settings_section once, as well as add_settings_field and register_setting methods for each option
+	*
+	* @param string $page
+	* @param string $section
+	* @param array $callbacks
+	*/
+	private function mc_log_settings( $page, $section, $callbacks ) {
+		add_settings_section( $page, ucwords( str_replace( '_', ' ', $page ) ), null, $page );
+		$log_settings = array(
+			'enable_logging'        => array(
+				'title'    => __( 'Enable Logging?', 'form-processor-mailchimp' ),
+				'callback' => $callbacks['text'],
+				'page'     => $page,
+				'section'  => $section,
+				'args'     => array(
+					'type'     => 'checkbox',
+					'validate' => 'absint',
+					'desc'     => '',
+					'constant' => '',
+				),
+			),
+			'statuses_to_log'       => array(
+				'title'    => __( 'Statuses to log', 'form-processor-mailchimp' ),
+				'callback' => $callbacks['checkboxes'],
+				'page'     => $page,
+				'section'  => $section,
+				'args'     => array(
+					'type'     => 'checkboxes',
+					'validate' => 'sanitize_validate_text',
+					'desc'     => __( 'these are the statuses to log', 'form-processor-mailchimp' ),
+					'items'    => array(
+						'error'   => array(
+							'text' => __( 'Error', 'form-processor-mailchimp' ),
+							'id'   => 'error',
+							'desc' => '',
+						),
+						'success' => array(
+							'text' => __( 'Success', 'form-processor-mailchimp' ),
+							'id'   => 'success',
+							'desc' => '',
+						),
+						'notice'  => array(
+							'text' => __( 'Notice', 'form-processor-mailchimp' ),
+							'id'   => 'notice',
+							'desc' => '',
+						),
+						'debug'   => array(
+							'text' => __( 'Debug', 'form-processor-mailchimp' ),
+							'id'   => 'debug',
+							'desc' => '',
+						),
+					),
+				),
+			),
+			'prune_logs'            => array(
+				'title'    => __( 'Automatically delete old log entries?', 'form-processor-mailchimp' ),
+				'callback' => $callbacks['text'],
+				'page'     => $page,
+				'section'  => $section,
+				'args'     => array(
+					'type'     => 'checkbox',
+					'validate' => 'absint',
+					'desc'     => '',
+					'constant' => '',
+				),
+			),
+			'logs_how_old'          => array(
+				'title'    => __( 'Age to delete log entries', 'form-processor-mailchimp' ),
+				'callback' => $callbacks['text'],
+				'page'     => $page,
+				'section'  => $section,
+				'args'     => array(
+					'type'     => 'text',
+					'validate' => 'sanitize_validate_text',
+					'desc'     => __( 'If automatic deleting is enabled, it will affect logs this old.', 'form-processor-mailchimp' ),
+					'default'  => '2 weeks',
+					'constant' => '',
+				),
+			),
+			'logs_how_often_number' => array(
+				'title'    => __( 'Check for old logs every', 'form-processor-mailchimp' ),
+				'callback' => $callbacks['text'],
+				'page'     => $page,
+				'section'  => $section,
+				'args'     => array(
+					'type'     => 'number',
+					'validate' => 'absint',
+					'desc'     => '',
+					'default'  => '1',
+					'constant' => '',
+				),
+			),
+			'logs_how_often_unit'   => array(
+				'title'    => __( 'Time unit', 'form-processor-mailchimp' ),
+				'callback' => $callbacks['select'],
+				'page'     => $page,
+				'section'  => $section,
+				'args'     => array(
+					'type'     => 'select',
+					'validate' => 'sanitize_validate_text',
+					'desc'     => __( 'These two fields are how often the site will check for logs to delete.', 'form-processor-mailchimp' ),
+					'items'    => array(
+						'minutes' => array(
+							'text'  => __( 'Minutes', 'form-processor-mailchimp' ),
+							'value' => 'minutes',
+						),
+						'hours'   => array(
+							'text'  => __( 'Hours', 'form-processor-mailchimp' ),
+							'value' => 'hours',
+						),
+						'days'    => array(
+							'text'  => __( 'Days', 'form-processor-mailchimp' ),
+							'value' => 'days',
+						),
+					),
+				),
+			),
+		);
+		foreach ( $log_settings as $key => $attributes ) {
+			$id       = $this->option_prefix . $key;
+			$name     = $this->option_prefix . $key;
+			$title    = $attributes['title'];
+			$callback = $attributes['callback'];
+			$page     = $attributes['page'];
+			$section  = $attributes['section'];
+			$args     = array_merge(
+				$attributes['args'],
+				array(
+					'title'     => $title,
+					'id'        => $id,
+					'label_for' => $id,
+					'name'      => $name,
+				)
+			);
+			add_settings_field( $id, $title, $callback, $page, $section, $args );
+			register_setting( $page, $id );
+		}
 	}
 
 	/**
