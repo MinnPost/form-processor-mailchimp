@@ -6,8 +6,8 @@
 
 
 // Start with composer autoload
-if ( file_exists( plugin_dir_path( __FILE__ ) . '../vendor/autoload.php' ) ) {
-	require_once plugin_dir_path( __FILE__ ) . '../vendor/autoload.php';
+if ( file_exists( dirname( FORM_PROCESSOR_MAILCHIMP_FILE ) . '/vendor/autoload.php' ) ) {
+	require_once dirname( FORM_PROCESSOR_MAILCHIMP_FILE ) . '/vendor/autoload.php';
 }
 
 /**
