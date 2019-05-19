@@ -26,5 +26,8 @@
     "require": {
         "drewm/mailchimp-api": "dev-master",
         "pippinsplugins/wp-logging": "dev-master"
+    },
+    "scripts": {
+        "remove-git-submodules" : "find . -mindepth 2 -type d -name .git | xargs rm -rf"
     }
 }
