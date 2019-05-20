@@ -24,7 +24,6 @@ class Form_Processor_Mailchimp_Logging extends WP_Logging {
 
 		$this->enabled         = get_option( $this->option_prefix . 'enable_logging', false );
 		$this->statuses_to_log = get_option( $this->option_prefix . 'statuses_to_log', array() );
-		$this->log_type        = 'mailchimp';
 
 		$this->schedule_name = 'wp_logging_prune_routine';
 
@@ -145,7 +144,7 @@ class Form_Processor_Mailchimp_Logging extends WP_Logging {
 	 * @return array $terms
 	 */
 	public function set_log_types( $terms ) {
-		$terms[] = $this->log_type;
+		$terms[] = 'mailchimp';
 		return $terms;
 	}
 
@@ -185,7 +184,7 @@ class Form_Processor_Mailchimp_Logging extends WP_Logging {
 	 * @return array $args
 	 */
 	public function set_prune_args( $args ) {
-		$args['wp_log_type'] = $this->log_type;
+		$args['wp_log_type'] = 'mailchimp';
 		return $args;
 	}
 
@@ -247,14 +246,14 @@ class Form_Processor_Mailchimp_Logging extends WP_Logging {
 	 * @uses        self::insert_log()
 	 * @param       string $message The log message.
 	 * @param       int $parent The parent WordPress object.
-	 * @param       string $type The type of log message; defaults to $this->log_type.
+	 * @param       string $type The type of log message; defaults to 'mailchimp'.
 	 *
 	 * @return      int The ID of the new log entry
 	 */
 	public static function add( $title = '', $message = '', $parent = 0, $type = '' ) {
 
 		if ( '' === $type ) {
-			$type = $this->log_type;
+			$type = 'mailchimp';
 		}
 
 		$log_data = array(
@@ -275,7 +274,7 @@ class Form_Processor_Mailchimp_Logging extends WP_Logging {
 	 * @since       1.0
 	 *
 	 * @param       int $object_id A WordPress object ID.
-	 * @param       string $type The type of log item; defaults to $this->log_type because that's the type of logs we create.
+	 * @param       string $type The type of log item; defaults to 'mailchimp' because that's the type of logs we create.
 	 * @param       int $paged Which page of results do we want?
 	 *
 	 * @uses        self::get_connected_logs()
@@ -284,7 +283,7 @@ class Form_Processor_Mailchimp_Logging extends WP_Logging {
 	 */
 	public static function get_logs( $object_id = 0, $type = '', $paged = null ) {
 		if ( '' === $type ) {
-			$type = $this->log_type;
+			$type = 'mailchimp';
 		}
 		return self::get_connected_logs(
 			array(
@@ -320,7 +319,7 @@ class Form_Processor_Mailchimp_Logging extends WP_Logging {
 			'posts_per_page' => 10,
 			'post_status'    => 'publish',
 			'paged'          => get_query_var( 'paged' ),
-			'log_type'       => $this->log_type,
+			'log_type'       => 'mailchimp',
 		);
 
 		$query_args = wp_parse_args( $args, $defaults );
@@ -356,7 +355,7 @@ class Form_Processor_Mailchimp_Logging extends WP_Logging {
 	 * @since   1.0
 	 *
 	 * @param       int $object_id A WordPress object ID.
-	 * @param       string $type The type of log item; defaults to $this->log_type because that's the type of logs we create.
+	 * @param       string $type The type of log item; defaults to 'mailchimp' because that's the type of logs we create.
 	 * @param       Array $meta_query A WordPress meta query, parseable by WP_Meta_Query.
 	 *
 	 * @uses    WP_Query()
@@ -367,7 +366,7 @@ class Form_Processor_Mailchimp_Logging extends WP_Logging {
 	public static function get_log_count( $object_id = 0, $type = '', $meta_query = null ) {
 
 		if ( '' === $type ) {
-			$type = $this->log_type;
+			$type = 'mailchimp';
 		}
 
 		$query_args = array(
