@@ -68,33 +68,9 @@ class Form_Processor_Mailchimp_MC {
 			$data   = $this->mailchimp_api->get( $call );
 			$cached = $this->wordpress->cache_set( $call, $data );
 			// create log entry if there is an error
-			if ( isset( $data['status'] ) && ! isset( $data['id'] ) ) {
-				$log_status = $data['status'];
-				$log_title  = sprintf(
-					// translators: placeholders are: 1) the server error code
-					esc_html__( 'MailChimp: %1$s on Load request', 'form-processor-mailchimp' ),
-					absint( $log_status )
-				);
-
-				$log_message = sprintf(
-					// translators: placeholders are: 1) api call, 2) params array, 3) reset flag, 4) api result
-					esc_html__( 'Load call was %1$s, params array is %2$s, reset is %3$s, result is %4$s.', 'form-processor-mailchimp' ),
-					esc_html( $call ),
-					print_r( $params, true ),
-					esc_attr( $reset ),
-					print_r( $data, true ),
-					is_array( $cached )
-				);
-
-				$log_entry = array(
-					'title'   => $log_title,
-					'message' => $log_message,
-					'trigger' => 0,
-					'parent'  => '',
-					'status'  => $log_status,
-				);
-
-				$this->logging->setup( $log_entry );
+			$success = $this->mailchimp_api->success();
+			if ( false === $success ) {
+				$this->log_error( 'Load', $reset );
 			}
 		}
 
@@ -170,33 +146,9 @@ class Form_Processor_Mailchimp_MC {
 		$result['method'] = $method;
 
 		// create log entry if there is an error
-		if ( isset( $result['status'] ) ) {
-			$log_status = $result['status'];
-			$log_title  = sprintf(
-				// translators: placeholders are: 1) the server error code, 2) what method was called
-				esc_html__( 'MailChimp: %1$s on %2$s Send request', 'form-processor-mailchimp' ),
-				absint( $log_status ),
-				esc_html( $method )
-			);
-
-			$log_message = sprintf(
-				// translators: placeholders are: 1) api call, 2) method, 3) params array, 4) api result
-				esc_html__( 'Send call was %1$s, method was %2$s, params array is %3$s, result is %4$s.', 'form-processor-mailchimp' ),
-				esc_html( $call ),
-				esc_attr( $method ),
-				print_r( $params, true ),
-				print_r( $result, true )
-			);
-
-			$log_entry = array(
-				'title'   => $log_title,
-				'message' => $log_message,
-				'trigger' => 0,
-				'parent'  => '',
-				'status'  => $log_status,
-			);
-
-			$this->logging->setup( $log_entry );
+		$success = $this->mailchimp_api->success();
+		if ( false === $success ) {
+			$this->log_error( 'Send' );
 		}
 
 		return $result;
@@ -234,5 +186,59 @@ class Form_Processor_Mailchimp_MC {
 		} elseif ( isset( $result['title'] ) ) {
 			return $result['title'];
 		}
+	}
+
+	/**
+	* Create log entry
+	*
+	* @param bool $reset
+	*/
+	private function log_error( $method = '', $reset = false ) {
+		$log_error   = $this->mailchimp_api->getLastError();
+		$log_body    = $this->mailchimp_api->getLastResponse()['body'];
+		$log_request = $this->mailchimp_api->getLastRequest();
+		if ( isset( $log_body ) ) {
+			$log_body = json_decode( $log_body, true );
+		}
+		$log_title = sprintf(
+			// translators: placeholders are: 1) method called in this class, 2) the api error message
+			esc_html__( 'MailChimp %1$s Error: %2$s', 'form-processor-mailchimp' ),
+			esc_html( $method ),
+			esc_html( $log_error )
+		);
+		$log_message = sprintf(
+			'<p>' .
+			// translators: placeholders are: 1) method called in this class, 2) api call, 3) reset flag, 4) API response body status, 5) API response body detail, 6) API response body instance, 7) API response body type, 8) request method, 9) API path, 10) API full URL, 11) API request body
+			esc_html__( '%1$s call was %2$s and reset value was %3$s.', 'form-processor-mailchimp' ) .
+			'</p>' .
+			'<p>' .
+			esc_html__( 'API response body was: ', 'form-processor-mailchimp' ) .
+			'</p>' .
+			'<ul><li><strong>Status:</strong> %4$s</li><li><strong>Detail:</strong> %5$s</li><li><strong>Instance:</strong> %6$s</li><li><strong>Type:</strong> %7$s</li></ul>' .
+			esc_html__( 'API request was: ', 'form-processor-mailchimp' ) .
+			'</p>' .
+			'<ul><li><strong>Method:</strong> %8$s</li><li><strong>Path:</strong> %9$s</li><li><strong>URL:</strong> %10$s</li><li><strong>Body:</strong> %11$s</li></ul>',
+			esc_html( $method ),
+			esc_html( $log_request['path'] ),
+			esc_attr( $reset ),
+			esc_html( $log_body['status'] ),
+			esc_html( $log_body['detail'] ),
+			esc_html( $log_body['instance'] ),
+			esc_html( $log_body['type'] ),
+			esc_html( $log_request['method'] ),
+			esc_html( $log_request['path'] ),
+			esc_html( $log_request['url'] ),
+			esc_html( $log_request['body'] )
+		);
+
+		$log_entry = array(
+			'title'   => $log_title,
+			'message' => $log_message,
+			'trigger' => 0,
+			'parent'  => '',
+			'status'  => esc_html( $log_body['status'] ),
+		);
+
+		$this->logging->setup( $log_entry );
 	}
 }
