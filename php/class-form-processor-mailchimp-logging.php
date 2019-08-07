@@ -234,9 +234,17 @@ class Form_Processor_Mailchimp_Logging extends WP_Logging {
 			$trigger     = $title_or_params['trigger'];
 			$parent      = $title_or_params['parent'];
 			$status      = $title_or_params['status'];
-			$status_code = $title_or_params['status_code'];
+			$status_code = isset( $title_or_params['status_code'] ) ? $title_or_params['status_code'] : '';
 		} else {
 			$title = $title_or_params;
+		}
+
+		if ( ! is_array( maybe_unserialize( $this->statuses_to_log ) ) ) {
+			if ( $status === $this->statuses_to_log ) {
+				$this->add( $title, $message, $parent );
+			} else {
+				return;
+			}
 		}
 
 		if ( true === filter_var( $this->enabled, FILTER_VALIDATE_BOOLEAN ) && in_array( $status, maybe_unserialize( $this->statuses_to_log ), true ) ) {
