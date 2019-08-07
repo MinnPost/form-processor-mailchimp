@@ -95,7 +95,7 @@ class Form_Processor_Mailchimp_Logging extends WP_Logging {
 	 */
 	public function set_log_slug( $slug, $post_ID, $post_status, $post_type ) {
 		if ( 'wp_log' === $post_type ) {
-			$slug = uniqid( $post_type . '-fpmc-', true ) . '-' . wp_generate_password( 32, false );
+			$slug = uniqid( $post_type . '-', true ) . '-' . wp_generate_password( 32, false );
 		}
 		return $slug;
 	}
