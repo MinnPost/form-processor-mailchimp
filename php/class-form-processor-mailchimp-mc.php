@@ -236,7 +236,7 @@ class Form_Processor_Mailchimp_MC {
 			'message' => $log_message,
 			'trigger' => 0,
 			'parent'  => '',
-			'status'  => esc_html( $log_body['status'] ),
+			'status'  => esc_attr( 'error' ),
 		);
 
 		$this->logging->setup( $log_entry );

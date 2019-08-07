@@ -218,34 +218,28 @@ class Form_Processor_Mailchimp_Logging extends WP_Logging {
 	 * @param       string|0 $trigger The type of log triggered. Usually one of: debug, notice, warning, error.
 	 * @param       int $parent The parent WordPress object.
 	 * @param       string $status The log status.
+	 * @param       int $status_code The HTTP status.
 	 *
 	 * @uses        self::add()
 	 * @see         Form_Processor_Mailchimp_Logging::__construct()    the location of the bitmasks that define the logging triggers.
 	 *
 	 * @return      void
 	 */
-	public function setup( $title_or_params, $message = '', $trigger = 0, $parent = 0, $status = '' ) {
+	public function setup( $title_or_params, $message = '', $trigger = 0, $parent = 0, $status = '', $status_code = '' ) {
 
 		if ( is_array( $title_or_params ) ) {
-			$title   = $title_or_params['title'];
-			$message = $title_or_params['message'];
-			$trigger = $title_or_params['trigger'];
-			$parent  = $title_or_params['parent'];
-			$status  = $title_or_params['status'];
+			$title       = $title_or_params['title'];
+			$message     = $title_or_params['message'];
+			$trigger     = $title_or_params['trigger'];
+			$parent      = $title_or_params['parent'];
+			$status      = $title_or_params['status'];
+			$status_code = $title_or_params['status_code'];
 		} else {
 			$title = $title_or_params;
 		}
 
-		//if ( '1' === $this->enabled && in_array( $status, maybe_unserialize( $this->statuses_to_log ), true ) ) {
-		if ( true === filter_var( $this->enabled, FILTER_VALIDATE_BOOLEAN ) ) {
-			//$triggers_to_log = get_option( $this->option_prefix . 'triggers_to_log', array() );
-			// if we force strict on this in_array, it fails because the mapping triggers are bit operators, as indicated in Object_Sync_Sf_Mapping class's method __construct()
-
-			/*if ( in_array( $trigger, maybe_unserialize( $triggers_to_log ) ) || 0 === $trigger ) {
-				$this->add( $title, $message, $parent );
-			} elseif ( is_array( $trigger ) && array_intersect( $trigger, maybe_unserialize( $triggers_to_log ) ) ) {*/
+		if ( true === filter_var( $this->enabled, FILTER_VALIDATE_BOOLEAN ) && in_array( $status, maybe_unserialize( $this->statuses_to_log ), true ) ) {
 			$this->add( $title, $message, $parent );
-			//}
 		}
 	}
 
