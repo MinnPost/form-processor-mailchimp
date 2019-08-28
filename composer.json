@@ -24,8 +24,11 @@
         }
     ],
     "require": {
-        "drewm/mailchimp-api": "dev-master",
+        "drewm/mailchimp-api": "2.5.4",
         "pippinsplugins/wp-logging": "dev-master"
+    },
+    "require-dev": {
+        "topfloor/composer-cleanup-vcs-dirs": "dev-master"
     },
     "scripts": {
         "remove-git-submodules" : "find . -mindepth 2 -type d -name .git | xargs rm -rf"
