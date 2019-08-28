@@ -2,7 +2,7 @@
 /*
 Plugin Name: Form Processor for MailChimp
 Description: This plugin processes a form that has been submitted to it, and integrates with the MailChimp API.
-Version: 0.0.7
+Version: 0.0.8
 Author: Jonathan Stegall
 Author URI: https://code.minnpost.com
 Text Domain: form-processor-mailchimp
@@ -33,7 +33,7 @@ define( 'FORM_PROCESSOR_MAILCHIMP_FILE', __FILE__ );
  * @since 0.0.6
  * @var string
  */
-define( 'FORM_PROCESSOR_MAILCHIMP_VERSION', '0.0.7' );
+define( 'FORM_PROCESSOR_MAILCHIMP_VERSION', '0.0.8' );
 
 // Load the autoloader.
 require_once( 'lib/autoloader.php' );
@@ -41,7 +41,7 @@ require_once( 'lib/autoloader.php' );
 /**
  * Retrieve the instance of the main plugin class
  *
- * @since 2.6.0
+ * @since 0.0.6
  * @return Form_Processor_Mailchimp
  */
 function form_processor_mailchimp() {
