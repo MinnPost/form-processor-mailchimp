@@ -674,7 +674,8 @@ class Form_Processor_Mailchimp_Admin {
 	*/
 	private function get_mailchimp_resource_types_options() {
 		$options = array();
-		if ( ! isset( $_GET['page'] ) || $this->slug !== $_GET['page'] ) {
+		global $pagenow;
+		if ( ( 'options.php' !== $pagenow ) && ( ! isset( $_GET['page'] ) || $this->slug !== $_GET['page'] ) ) {
 			return;
 		}
 		$resources = $this->mailchimp->load( '' );
@@ -703,7 +704,8 @@ class Form_Processor_Mailchimp_Admin {
 	*/
 	private function get_mailchimp_resources_options( $resource_type ) {
 		$options = array();
-		if ( ! isset( $_GET['page'] ) || $this->slug !== $_GET['page'] ) {
+		global $pagenow;
+		if ( ( 'options.php' !== $pagenow ) && ( ! isset( $_GET['page'] ) || $this->slug !== $_GET['page'] ) ) {
 			return;
 		}
 		$resources = $this->mailchimp->load( $resource_type );
@@ -730,7 +732,8 @@ class Form_Processor_Mailchimp_Admin {
 	*/
 	private function get_mailchimp_subresource_type_options( $resource_type = '' ) {
 		$options = array();
-		if ( ! isset( $_GET['page'] ) || $this->slug !== $_GET['page'] ) {
+		global $pagenow;
+		if ( ( 'options.php' !== $pagenow ) && ( ! isset( $_GET['page'] ) || $this->slug !== $_GET['page'] ) ) {
 			return;
 		}
 		$subresource_types = $this->mailchimp->load( $resource_type );
@@ -761,7 +764,8 @@ class Form_Processor_Mailchimp_Admin {
 	*/
 	private function get_mailchimp_subresource_options( $resource_type, $resource_id, $subresource_type ) {
 		$options = array();
-		if ( ! isset( $_GET['page'] ) || $this->slug !== $_GET['page'] ) {
+		global $pagenow;
+		if ( ( 'options.php' !== $pagenow ) && ( ! isset( $_GET['page'] ) || $this->slug !== $_GET['page'] ) ) {
 			return;
 		}
 		$subresources = $this->mailchimp->load( $resource_type . '/' . $resource_id . '/' . $subresource_type );
@@ -833,7 +837,8 @@ class Form_Processor_Mailchimp_Admin {
 	private function get_mailchimp_method_options( $resource_type = '', $resource = '', $subresource_type = '' ) {
 
 		$options = array();
-		if ( ! isset( $_GET['page'] ) || $this->slug !== $_GET['page'] ) {
+		global $pagenow;
+		if ( ( 'options.php' !== $pagenow ) && ( ! isset( $_GET['page'] ) || $this->slug !== $_GET['page'] ) ) {
 			return;
 		}
 
@@ -885,7 +890,8 @@ class Form_Processor_Mailchimp_Admin {
 	private function get_mailchimp_items( $resource_type = '', $resource = '', $subresource_type = '', $subresource = '', $method = '' ) {
 
 		$options = array();
-		if ( ! isset( $_GET['page'] ) || $this->slug !== $_GET['page'] ) {
+		global $pagenow;
+		if ( ( 'options.php' !== $pagenow ) && ( ! isset( $_GET['page'] ) || $this->slug !== $_GET['page'] ) ) {
 			return;
 		}
 
