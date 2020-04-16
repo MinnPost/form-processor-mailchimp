@@ -15,6 +15,7 @@ class Form_Processor_Mailchimp_Logging extends WP_Logging {
 	public $statuses_to_log;
 
 	private $schedule_name;
+	private $capability;
 
 	public function __construct() {
 
@@ -26,8 +27,7 @@ class Form_Processor_Mailchimp_Logging extends WP_Logging {
 		$this->statuses_to_log = get_option( $this->option_prefix . 'statuses_to_log', array() );
 
 		$this->schedule_name = 'wp_logging_prune_routine';
-
-		$this->capability = 'manage_options';
+		$this->capability    = 'manage_options';
 
 		$this->add_actions();
 
@@ -154,7 +154,7 @@ class Form_Processor_Mailchimp_Logging extends WP_Logging {
 			)
 		);
 		if ( is_array( $terms ) ) {
-			echo esc_attr( $terms[0] );
+			echo isset( $terms[0] ) ? esc_attr( $terms[0] ) : '';
 		}
 	}
 
