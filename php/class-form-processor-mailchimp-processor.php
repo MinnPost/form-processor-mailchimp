@@ -25,15 +25,13 @@ class Form_Processor_Mailchimp_Processor {
 		$this->wordpress     = form_processor_mailchimp()->wordpress;
 		$this->mailchimp     = form_processor_mailchimp()->mailchimp;
 
-		$this->init();
+		$this->add_actions();
 	}
 
 	/**
-	* Initialize REST API routes
-	*
-	* @throws \Exception
+	* Add action hooks
 	*/
-	private function init() {
+	private function add_actions() {
 		add_action( 'rest_api_init', array( $this, 'register_routes' ) );
 	}
 
@@ -47,100 +45,120 @@ class Form_Processor_Mailchimp_Processor {
 		$namespace   = $this->namespace . $this->api_version;
 		$method_list = get_option( $this->option_prefix . 'http_methods', '' );
 
-		register_rest_route( $namespace, '/(?P<resource_type>([\w-])+)/', array(
+		register_rest_route(
+			$namespace,
+			'/(?P<resource_type>([\w-])+)/',
 			array(
-				'methods'             => $method_list,
-				'callback'            => array( $this, 'process' ),
-				'args'                => array(
-					'resource_type' => array(
-						'validate_callback' => array( $this, 'check_resource_type' ),
+				array(
+					'methods'             => $method_list,
+					'callback'            => array( $this, 'process' ),
+					'args'                => array(
+						'resource_type' => array(
+							'validate_callback' => array( $this, 'check_resource_type' ),
+						),
 					),
+					'permission_callback' => array( $this, 'can_process' ),
 				),
-				'permission_callback' => array( $this, 'can_process' ),
-			),
-		) );
+			)
+		);
 
-		register_rest_route( $namespace, '/(?P<resource_type>([\w-])+)/' . '(?P<resource>([\w-])+)/', array(
+		register_rest_route(
+			$namespace,
+			'/(?P<resource_type>([\w-])+)/' . '(?P<resource>([\w-])+)/',
 			array(
-				'methods'             => $method_list,
-				'callback'            => array( $this, 'process' ),
-				'args'                => array(
-					'resource_type' => array(
-						'validate_callback' => array( $this, 'check_resource_type' ),
+				array(
+					'methods'             => $method_list,
+					'callback'            => array( $this, 'process' ),
+					'args'                => array(
+						'resource_type' => array(
+							'validate_callback' => array( $this, 'check_resource_type' ),
+						),
+						'resource'      => array(
+							'validate_callback' => array( $this, 'check_resource' ),
+						),
 					),
-					'resource'      => array(
-						'validate_callback' => array( $this, 'check_resource' ),
-					),
+					'permission_callback' => array( $this, 'can_process' ),
 				),
-				'permission_callback' => array( $this, 'can_process' ),
-			),
-		) );
+			)
+		);
 
-		register_rest_route( $namespace, '/(?P<resource_type>([\w-])+)/' . '(?P<resource>([\w-])+)/' . '(?P<subresource_type>([\w-])+)/', array(
+		register_rest_route(
+			$namespace,
+			'/(?P<resource_type>([\w-])+)/' . '(?P<resource>([\w-])+)/' . '(?P<subresource_type>([\w-])+)/',
 			array(
-				'methods'             => $method_list,
-				'callback'            => array( $this, 'process' ),
-				'args'                => array(
-					'resource_type'    => array(
-						'validate_callback' => array( $this, 'check_resource_type' ),
+				array(
+					'methods'             => $method_list,
+					'callback'            => array( $this, 'process' ),
+					'args'                => array(
+						'resource_type'    => array(
+							'validate_callback' => array( $this, 'check_resource_type' ),
+						),
+						'resource'         => array(
+							'validate_callback' => array( $this, 'check_resource' ),
+						),
+						'subresource_type' => array(
+							'validate_callback' => array( $this, 'check_subresource_type' ),
+						),
 					),
-					'resource'         => array(
-						'validate_callback' => array( $this, 'check_resource' ),
-					),
-					'subresource_type' => array(
-						'validate_callback' => array( $this, 'check_subresource_type' ),
-					),
+					'permission_callback' => array( $this, 'can_process' ),
 				),
-				'permission_callback' => array( $this, 'can_process' ),
-			),
-		) );
+			)
+		);
 
-		register_rest_route( $namespace, '/(?P<resource_type>([\w-])+)/' . '(?P<resource>([\w-])+)/' . '(?P<subresource_type>([\w-])+)/' . '(?P<subresource>([\w-])+)/', array(
+		register_rest_route(
+			$namespace,
+			'/(?P<resource_type>([\w-])+)/' . '(?P<resource>([\w-])+)/' . '(?P<subresource_type>([\w-])+)/' . '(?P<subresource>([\w-])+)/',
 			array(
-				'methods'             => $method_list,
-				'callback'            => array( $this, 'process' ),
-				'args'                => array(
-					'resource_type'    => array(
-						'validate_callback' => array( $this, 'check_resource_type' ),
+				array(
+					'methods'             => $method_list,
+					'callback'            => array( $this, 'process' ),
+					'args'                => array(
+						'resource_type'    => array(
+							'validate_callback' => array( $this, 'check_resource_type' ),
+						),
+						'resource'         => array(
+							'validate_callback' => array( $this, 'check_resource' ),
+						),
+						'subresource_type' => array(
+							'validate_callback' => array( $this, 'check_subresource_type' ),
+						),
+						'subresource'      => array(
+							'validate_callback' => array( $this, 'check_subresource' ),
+						),
 					),
-					'resource'         => array(
-						'validate_callback' => array( $this, 'check_resource' ),
-					),
-					'subresource_type' => array(
-						'validate_callback' => array( $this, 'check_subresource_type' ),
-					),
-					'subresource'      => array(
-						'validate_callback' => array( $this, 'check_subresource' ),
-					),
+					'permission_callback' => array( $this, 'can_process' ),
 				),
-				'permission_callback' => array( $this, 'can_process' ),
-			),
-		) );
+			)
+		);
 
-		register_rest_route( $namespace, '/(?P<resource_type>([\w-])+)/' . '(?P<resource>([\w-])+)/' . '(?P<subresource_type>([\w-])+)/' . '(?P<subresource>([\w-])+)/' . '(?P<method>([\w-])+)/', array(
+		register_rest_route(
+			$namespace,
+			'/(?P<resource_type>([\w-])+)/' . '(?P<resource>([\w-])+)/' . '(?P<subresource_type>([\w-])+)/' . '(?P<subresource>([\w-])+)/' . '(?P<method>([\w-])+)/',
 			array(
-				'methods'             => $method_list,
-				'callback'            => array( $this, 'process' ),
-				'args'                => array(
-					'resource_type'    => array(
-						'validate_callback' => array( $this, 'check_resource_type' ),
+				array(
+					'methods'             => $method_list,
+					'callback'            => array( $this, 'process' ),
+					'args'                => array(
+						'resource_type'    => array(
+							'validate_callback' => array( $this, 'check_resource_type' ),
+						),
+						'resource'         => array(
+							'validate_callback' => array( $this, 'check_resource' ),
+						),
+						'subresource_type' => array(
+							'validate_callback' => array( $this, 'check_subresource_type' ),
+						),
+						'subresource'      => array(
+							'validate_callback' => array( $this, 'check_subresource' ),
+						),
+						'method'           => array(
+							'validate_callback' => array( $this, 'check_method' ),
+						),
 					),
-					'resource'         => array(
-						'validate_callback' => array( $this, 'check_resource' ),
-					),
-					'subresource_type' => array(
-						'validate_callback' => array( $this, 'check_subresource_type' ),
-					),
-					'subresource'      => array(
-						'validate_callback' => array( $this, 'check_subresource' ),
-					),
-					'method'           => array(
-						'validate_callback' => array( $this, 'check_method' ),
-					),
+					'permission_callback' => array( $this, 'can_process' ),
 				),
-				'permission_callback' => array( $this, 'can_process' ),
-			),
-		) );
+			)
+		);
 	}
 
 	/**
