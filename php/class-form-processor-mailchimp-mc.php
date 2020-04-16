@@ -16,6 +16,7 @@ class Form_Processor_Mailchimp_MC {
 	public $wordpress;
 
 	public $api_key;
+	public $mailchimp_api;
 
 	public function __construct() {
 
@@ -25,6 +26,14 @@ class Form_Processor_Mailchimp_MC {
 		$this->wordpress     = form_processor_mailchimp()->wordpress;
 		$this->logging       = form_processor_mailchimp()->logging;
 
+		$this->api_key       = '';
+		$this->mailchimp_api = '';
+
+		add_action( 'init', array( $this, 'add_actions' ) );
+
+	}
+
+	public function add_actions() {
 		$this->api_key       = defined( 'FORM_PROCESSOR_MC_MAILCHIMP_API_KEY' ) ? FORM_PROCESSOR_MC_MAILCHIMP_API_KEY : get_option( $this->option_prefix . 'mailchimp_api_key', '' );
 		$this->mailchimp_api = $this->mailchimp_api();
 	}
@@ -38,13 +47,41 @@ class Form_Processor_Mailchimp_MC {
 		if ( ! class_exists( 'DrewM/Mailchimp/MailChimp' ) ) {
 			require_once plugin_dir_path( __FILE__ ) . '../vendor/autoload.php';
 		}
-		$mailchimp_key = $this->api_key;
-		if ( '' !== $mailchimp_key ) {
+		$mailchimp_key          = $this->api_key;
+		$mailchimp_key_is_valid = $this->check_api_key( $mailchimp_key );
+		if ( true === $mailchimp_key_is_valid ) {
 			$mailchimp_api = new MailChimp( $mailchimp_key );
 			return $mailchimp_api;
 		} else {
 			return '';
 		}
+	}
+
+	/**
+	* Check the MailChimp API key the way the library does and see if it's valid.
+	*
+	* @param string $mailchimp_api_key
+	* @return bool $key_is_valid
+	*/
+	private function check_api_key( $mailchimp_api_key ) {
+		$key_is_valid = true;
+		if ( '' === $mailchimp_api_key || strpos( $mailchimp_api_key, '-' ) === false ) {
+			$key_is_valid = false;
+			$log_message  = sprintf(
+				// translators: placeholders are: 1) the supplied API key
+				esc_html__( 'According to the MailChimp API library this plugin uses, the supplied api key was invalid. The submitted key is %1$s.', 'form-processor-mailchimp' ),
+				esc_html( $mailchimp_api_key )
+			);
+			$log_entry = array(
+				'title'   => __( 'Invalid MailChimp API key supplied', 'form-processor-mailchimp' ),
+				'message' => $log_message,
+				'trigger' => 0,
+				'parent'  => '',
+				'status'  => esc_attr( 'error' ),
+			);
+			$this->logging->setup( $log_entry );
+		}
+		return $key_is_valid;
 	}
 
 	/**
