@@ -37,6 +37,12 @@ class Form_Processor_Mailchimp {
 	public $slug;
 
 	/**
+	* @var object
+	* Akismet
+	*/
+	public $akismet;
+
+	/**
 	 * Plugin API namespace
 	 * @var string
 	 */
@@ -103,6 +109,9 @@ class Form_Processor_Mailchimp {
 
 		// Logging features
 		$this->logging = new Form_Processor_Mailchimp_Logging();
+
+		// Akismet setup
+		$this->akismet = new Form_Processor_Mailchimp_Akismet();
 
 		// WordPress features
 		$this->wordpress = new Form_Processor_Mailchimp_WP();

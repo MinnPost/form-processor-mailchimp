@@ -207,6 +207,19 @@ class Form_Processor_Mailchimp_Admin {
 			),
 		);
 
+		if ( true === form_processor_mailchimp()->akismet->akismet_is_available() ) {
+			$settings['check_akismet'] = array(
+				'title'    => __( 'Check for spam against Akismet API?', 'form-processor-mailchimp' ),
+				'callback' => $callbacks['text'],
+				'page'     => $page,
+				'section'  => $section,
+				'args'     => array(
+					'type' => 'checkbox',
+					'desc' => __( 'Whether to check user submitted data against the Akismet API.', 'form-processor-mailchimp' ),
+				),
+			);
+		}
+
 		foreach ( $settings as $key => $attributes ) {
 			$id       = $this->option_prefix . $key;
 			$name     = $this->option_prefix . $key;
