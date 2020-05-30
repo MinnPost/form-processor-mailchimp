@@ -135,6 +135,23 @@ class Form_Processor_Mailchimp_MC {
 	*/
 	public function send( $call = '', $method = 'POST', $params = array() ) {
 		$result = '';
+
+		// check for spam here
+		$spam = apply_filters( $this->option_prefix . 'check_spam', false, $_POST );
+		if ( true === $spam ) {
+			$result = array(
+				'status' => 'spam',
+				'method' => $method,
+				'local'  => true,
+				'detail' => sprintf(
+					// translators: placeholder is the submitted email address
+					esc_html__( 'Our email system flagged %1$s as a spam address. Please enter a valid email address.', 'form-processor-mailchimp' ),
+					'<strong>' . esc_attr( $params['email_address'] ) . '</strong>'
+				),
+			);
+			return $result;
+		}
+
 		// this is not flexible enough for broad use, but it does work for the member update
 		// email needs to be lowercase before being hashed
 		// see: https://developer.mailchimp.com/documentation/mailchimp/guides/manage-subscribers-with-the-mailchimp-api/
