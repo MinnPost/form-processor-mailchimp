@@ -147,7 +147,7 @@ class Form_Processor_Mailchimp_MC {
 					// translators: placeholder is the submitted email address
 					esc_html__( 'Oops! For some reason our automated system has flagged %1$s as a spam address. You can try to subscribe using a different address, or if you think this was in error contact us at %2$s.', 'form-processor-mailchimp' ),
 					'<strong>' . esc_attr( $params['email_address'] ) . '</strong>',
-					'<a href="mailto:feedback@minnpost.com">feedback@minnpost.com'
+					'<a href="mailto:feedback@minnpost.com">feedback@minnpost.com</a>'
 				),
 			);
 			return $result;
