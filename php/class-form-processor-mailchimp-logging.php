@@ -142,7 +142,7 @@ class Form_Processor_Mailchimp_Logging extends WP_Logging {
 	 * @param int $post_id
 	 */
 	public function type_column_content( $column_name, $post_id ) {
-		if ( 'type' != $column_name ) {
+		if ( 'type' !== $column_name ) {
 			return;
 		}
 		// get wp_log_type
@@ -196,10 +196,10 @@ class Form_Processor_Mailchimp_Logging extends WP_Logging {
 		if ( 'wp_log' === $post_type ) {
 			// get wp_log_type
 			$terms = get_terms(
-				[
+				array(
 					'taxonomy'   => $taxonomy,
 					'hide_empty' => true,
-				]
+				)
 			);
 			if ( is_wp_error( $terms ) || empty( $terms ) ) {
 				// no terms, or the taxonomy doesn't exist, skip

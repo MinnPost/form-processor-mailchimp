@@ -90,7 +90,7 @@ class Form_Processor_Mailchimp_Akismet {
 		$ignore = array( 'HTTP_COOKIE', 'HTTP_COOKIE2', 'PHP_AUTH_PW' );
 
 		foreach ( $_SERVER as $key => $value ) {
-			if ( ! in_array( $key, (array) $ignore ) ) {
+			if ( ! in_array( $key, (array) $ignore, true ) ) {
 				$c[ "$key" ] = $value;
 			}
 		}
@@ -123,7 +123,7 @@ class Form_Processor_Mailchimp_Akismet {
 		$has_akismet_option = false;
 
 		foreach ( (array) $posted_data as $key => $value ) {
-			if ( 'submit' === $key || 'password' === $key || '_wpnonce' == $key ) {
+			if ( 'submit' === $key || 'password' === $key || '_wpnonce' === $key ) {
 				continue;
 			}
 
@@ -133,13 +133,14 @@ class Form_Processor_Mailchimp_Akismet {
 
 			$value = trim( $value );
 
-			if ( 0 == strlen( $value ) ) {
+			if ( 0 === strlen( $value ) ) {
 				continue;
 			}
 
-			if ( in_array( $key, array_keys( $params ) ) ) {
+			if ( in_array( $key, array_keys( $params ), true ) ) {
 				$params[ $key ] = $value;
 			}
+
 			$params['content'] .= "\n\n" . $value;
 		}
 

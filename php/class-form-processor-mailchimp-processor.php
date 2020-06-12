@@ -171,7 +171,7 @@ class Form_Processor_Mailchimp_Processor {
 	public function check_resource_type( $resource_type, $request ) {
 		if ( isset( $resource_type ) ) {
 			$allowed_resource_types = get_option( $this->option_prefix . 'resource_types', array() );
-			if ( in_array( $resource_type, $allowed_resource_types ) ) {
+			if ( in_array( $resource_type, $allowed_resource_types, true ) ) {
 				return true;
 			}
 		}
@@ -190,7 +190,7 @@ class Form_Processor_Mailchimp_Processor {
 		$resource_type = $url_params['resource_type'];
 		$resources     = get_option( $this->option_prefix . 'resources_' . $resource_type, array() );
 		if ( isset( $resources[ $resource_type ] ) ) {
-			if ( in_array( $resource, $resources[ $resource_type ] ) ) {
+			if ( in_array( $resource, $resources[ $resource_type ], true ) ) {
 				return true;
 			}
 		}
@@ -209,7 +209,7 @@ class Form_Processor_Mailchimp_Processor {
 		$resource_type     = $url_params['resource_type'];
 		$subresource_types = get_option( $this->option_prefix . 'subresource_types_' . $resource_type, array() );
 		if ( isset( $subresource_types[ $resource_type ] ) ) {
-			if ( in_array( $subresource_type, $subresource_types[ $resource_type ] ) ) {
+			if ( in_array( $subresource_type, $subresource_types[ $resource_type ], true ) ) {
 				return true;
 			}
 		}
@@ -230,7 +230,7 @@ class Form_Processor_Mailchimp_Processor {
 		$subresource_type = $url_params['subresource_type'];
 		$subresources     = get_option( $this->option_prefix . 'subresources_' . $resource . '_' . $subresource_type, array() );
 		if ( isset( $subresources[ $resource_type ][ $resource ][ $subresource_type ] ) ) {
-			if ( in_array( $subresource, $subresources[ $resource_type ][ $resource ][ $subresource_type ] ) ) {
+			if ( in_array( $subresource, $subresources[ $resource_type ][ $resource ][ $subresource_type ], true ) ) {
 				return true;
 			}
 		}
@@ -254,7 +254,7 @@ class Form_Processor_Mailchimp_Processor {
 		$subresource_type = $url_params['subresource_type'];
 		$methods          = get_option( $this->option_prefix . 'subresource_methods', array() );
 		if ( isset( $methods[ $resource_type ][ $resource ][ $subresource_type ] ) ) {
-			if ( in_array( $method, $methods[ $resource_type ][ $resource ][ $subresource_type ] ) ) {
+			if ( in_array( $method, $methods[ $resource_type ][ $resource ][ $subresource_type ], true ) ) {
 				return true;
 			}
 		}

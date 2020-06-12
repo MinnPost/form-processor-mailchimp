@@ -115,7 +115,7 @@ class Form_Processor_Mailchimp_MC {
 			$allowed_items = get_option( $this->option_prefix . 'items_' . $resource . '_' . $subresource_type . '_' . $subresource . '_' . $method, false )[ $resource_type ][ $resource ][ $subresource_type ];
 			if ( is_array( $data[ $method ] ) ) {
 				foreach ( $data[ $method ] as $key => $item ) {
-					if ( is_array( $allowed_items ) && ! in_array( $item['id'], $allowed_items ) ) {
+					if ( is_array( $allowed_items ) && ! in_array( $item['id'], $allowed_items, true ) ) {
 						unset( $data[ $method ][ $key ] );
 					}
 				}

@@ -114,7 +114,8 @@ class Form_Processor_Mailchimp_Admin {
 		foreach ( $tabs as $tab_key => $tab_caption ) {
 			$active = $current_tab === $tab_key ? ' nav-tab-active' : '';
 			if ( 'mc_settings' === $tab_key || ( isset( $mailchimp_api ) && ! empty( $mailchimp_api ) ) ) {
-				echo sprintf( '<a class="nav-tab%1$s" href="%2$s">%3$s</a>',
+				echo sprintf(
+					'<a class="nav-tab%1$s" href="%2$s">%3$s</a>',
 					esc_attr( $active ),
 					esc_url( '?page=' . $this->slug . '&tab=' . $tab_key ),
 					esc_html( $tab_caption )
@@ -282,7 +283,8 @@ class Form_Processor_Mailchimp_Admin {
 		if ( '' !== get_option( $this->option_prefix . 'resource_types', '' ) ) {
 			foreach ( get_option( $this->option_prefix . 'resource_types', '' ) as $type ) {
 				// translators: parameter is the resource type
-				$title = sprintf( 'Allowed Resources - %1$s',
+				$title = sprintf(
+					'Allowed Resources - %1$s',
 					ucfirst( $type )
 				);
 
@@ -369,7 +371,8 @@ class Form_Processor_Mailchimp_Admin {
 								if ( ! empty( $options ) ) {
 
 									// translators: 1) is the subresource type, replacing dashes with spaces; 2 is the name of the resource
-									$title = sprintf( 'Allowed %1$s - %2$s',
+									$title = sprintf(
+										'Allowed %1$s - %2$s',
 										ucwords( str_replace( '-', ' ', $subresource_type ) ),
 										ucfirst( $resource_name )
 									);
@@ -486,7 +489,8 @@ class Form_Processor_Mailchimp_Admin {
 													$group_title = $this->mailchimp->get_name( $resource_type, $resource, $subresource_type, $subresource );
 
 													// translators: parameter is the name of the group
-													$title = sprintf( 'Allowed items - %1$s',
+													$title = sprintf(
+														'Allowed items - %1$s',
 														$group_title
 													);
 
@@ -695,7 +699,7 @@ class Form_Processor_Mailchimp_Admin {
 		if ( ! empty( $resources['_links'] ) ) {
 			foreach ( $resources['_links'] as $link ) {
 				// this is where we check for supported resources. again, ideally this would go away one day.
-				if ( 'self' !== $link['rel'] && in_array( $link['rel'], $this->supported_resources ) ) {
+				if ( 'self' !== $link['rel'] && in_array( $link['rel'], $this->supported_resources, true ) ) {
 					$options[ $link['rel'] ] = array(
 						'text'    => ucwords( str_replace( '-', ' ', $link['rel'] ) ),
 						'id'      => $link['rel'],
@@ -752,7 +756,7 @@ class Form_Processor_Mailchimp_Admin {
 		$subresource_types = $this->mailchimp->load( $resource_type );
 		if ( is_array( $subresource_types[ $resource_type ][0]['_links'] ) ) {
 			foreach ( $subresource_types[ $resource_type ][0]['_links'] as $link ) {
-				if ( ! in_array( $link['rel'], array( 'self', 'parent', 'update', 'delete' ) ) ) {
+				if ( ! in_array( $link['rel'], array( 'self', 'parent', 'update', 'delete' ), true ) ) {
 					$options[ $link['rel'] ] = array(
 						'resource_type' => $resource_type,
 						'text'          => ucwords( str_replace( '-', ' ', $link['rel'] ) ),
@@ -872,7 +876,7 @@ class Form_Processor_Mailchimp_Admin {
 
 		if ( isset( $methods[ $key ][0]['_links'] ) ) {
 			foreach ( $methods[ $key ][0]['_links'] as $link ) {
-				if ( ! in_array( $link['rel'], array( 'self', 'parent', 'create', 'update', 'upsert', 'delete' ) ) ) {
+				if ( ! in_array( $link['rel'], array( 'self', 'parent', 'create', 'update', 'upsert', 'delete' ), true ) ) {
 					$options[ $link['rel'] ] = array(
 						'resource_type'    => $resource_type,
 						'resource'         => $resource,
@@ -942,11 +946,14 @@ class Form_Processor_Mailchimp_Admin {
 	*/
 	public function plugin_action_links( $links, $file ) {
 		if ( plugin_basename( FORM_PROCESSOR_MAILCHIMP_FILE ) === $file ) {
-			array_unshift( $links, sprintf(
-				'<a href="%1$s">%2$s</a>',
-				form_processor_mailchimp()->get_menu_url(),
-				__( 'Settings', 'form-processor-mailchimp' )
-			) );
+			array_unshift(
+				$links,
+				sprintf(
+					'<a href="%1$s">%2$s</a>',
+					form_processor_mailchimp()->get_menu_url(),
+					__( 'Settings', 'form-processor-mailchimp' )
+				)
+			);
 		} // End if()
 		return $links;
 	}
@@ -982,7 +989,8 @@ class Form_Processor_Mailchimp_Admin {
 				$value = $args['default'];
 			}
 
-			echo sprintf( '<input type="%1$s" value="%2$s" name="%3$s" id="%4$s" class="%5$s"%6$s>',
+			echo sprintf(
+				'<input type="%1$s" value="%2$s" name="%3$s" id="%4$s" class="%5$s"%6$s>',
 				esc_attr( $type ),
 				esc_attr( $value ),
 				esc_attr( $name ),
@@ -991,12 +999,14 @@ class Form_Processor_Mailchimp_Admin {
 				esc_html( $checked )
 			);
 			if ( '' !== $desc ) {
-				echo sprintf( '<p class="description">%1$s</p>',
+				echo sprintf(
+					'<p class="description">%1$s</p>',
 					esc_html( $desc )
 				);
 			}
 		} else {
-			echo sprintf( '<p><code>%1$s</code></p>',
+			echo sprintf(
+				'<p><code>%1$s</code></p>',
 				esc_html__( 'Defined in wp-config.php', 'form-processor-mailchimp' )
 			);
 		}
@@ -1083,7 +1093,8 @@ class Form_Processor_Mailchimp_Admin {
 				$input_name = $name;
 			}
 
-			echo sprintf( '<div class="checkbox"><label><input type="%1$s" value="%2$s" name="%3$s[]" id="%4$s"%5$s>%6$s</label></div>',
+			echo sprintf(
+				'<div class="checkbox"><label><input type="%1$s" value="%2$s" name="%3$s[]" id="%4$s"%5$s>%6$s</label></div>',
 				esc_attr( $type ),
 				esc_attr( $item_value ),
 				esc_attr( $input_name ),
@@ -1092,14 +1103,16 @@ class Form_Processor_Mailchimp_Admin {
 				esc_html( $text )
 			);
 			if ( '' !== $desc ) {
-				echo sprintf( '<p class="description">%1$s</p>',
+				echo sprintf(
+					'<p class="description">%1$s</p>',
 					esc_html( $desc )
 				);
 			}
 		}
 
 		if ( '' !== $group_desc ) {
-			echo sprintf( '<p class="description">%1$s</p>',
+			echo sprintf(
+				'<p class="description">%1$s</p>',
 				esc_html( $group_desc )
 			);
 		}
@@ -1119,7 +1132,8 @@ class Form_Processor_Mailchimp_Admin {
 		if ( ! isset( $args['constant'] ) || ! defined( $args['constant'] ) ) {
 			$current_value = get_option( $name );
 
-			echo sprintf( '<div class="select"><select id="%1$s" name="%2$s"><option value="">- Select one -</option>',
+			echo sprintf(
+				'<div class="select"><select id="%1$s" name="%2$s"><option value="">- Select one -</option>',
 				esc_attr( $id ),
 				esc_attr( $name )
 			);
@@ -1132,7 +1146,8 @@ class Form_Processor_Mailchimp_Admin {
 					$selected = ' selected';
 				}
 
-				echo sprintf( '<option value="%1$s"%2$s>%3$s</option>',
+				echo sprintf(
+					'<option value="%1$s"%2$s>%3$s</option>',
 					esc_attr( $value ),
 					esc_attr( $selected ),
 					esc_html( $text )
@@ -1141,13 +1156,15 @@ class Form_Processor_Mailchimp_Admin {
 			}
 			echo '</select>';
 			if ( '' !== $desc ) {
-				echo sprintf( '<p class="description">%1$s</p>',
+				echo sprintf(
+					'<p class="description">%1$s</p>',
 					esc_html( $desc )
 				);
 			}
 			echo '</div>';
 		} else {
-			echo sprintf( '<p><code>%1$s</code></p>',
+			echo sprintf(
+				'<p><code>%1$s</code></p>',
 				esc_html__( 'Defined in wp-config.php', 'form-processor-mailchimp' )
 			);
 		}
@@ -1163,20 +1180,23 @@ class Form_Processor_Mailchimp_Admin {
 		$desc  = $args['desc'];
 		$url   = $args['url'];
 		if ( isset( $args['link_class'] ) ) {
-			echo sprintf( '<p><a class="%1$s" href="%2$s">%3$s</a></p>',
+			echo sprintf(
+				'<p><a class="%1$s" href="%2$s">%3$s</a></p>',
 				esc_attr( $args['link_class'] ),
 				esc_url( $url ),
 				esc_html( $label )
 			);
 		} else {
-			echo sprintf( '<p><a href="%1$s">%2$s</a></p>',
+			echo sprintf(
+				'<p><a href="%1$s">%2$s</a></p>',
 				esc_url( $url ),
 				esc_html( $label )
 			);
 		}
 
 		if ( '' !== $desc ) {
-			echo sprintf( '<p class="description">%1$s</p>',
+			echo sprintf(
+				'<p class="description">%1$s</p>',
 				esc_html( $desc )
 			);
 		}
