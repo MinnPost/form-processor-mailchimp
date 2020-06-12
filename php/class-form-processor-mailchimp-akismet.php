@@ -114,6 +114,7 @@ class Form_Processor_Mailchimp_Akismet {
 
 		$params = array(
 			'email_address' => '',
+			'email'         => '',
 			'first_name'    => '',
 			'last_name'     => '',
 			'author_url'    => '',
@@ -142,6 +143,10 @@ class Form_Processor_Mailchimp_Akismet {
 			}
 
 			$params['content'] .= "\n\n" . $value;
+		}
+
+		if ( '' === $params['email_address'] && '' !== $params['email'] ) {
+			$params['email_address'] = $params['email'];
 		}
 
 		$params['content'] = trim( $params['content'] );
