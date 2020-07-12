@@ -136,6 +136,8 @@ class Form_Processor_Mailchimp_MC {
 	public function send( $call = '', $method = 'POST', $params = array() ) {
 		$result = '';
 
+		$help_email_address = defined( 'FORM_PROCESSOR_MC_MAILCHIMP_HELP_EMAIL_ADDRESS' ) ? FORM_PROCESSOR_MC_MAILCHIMP_HELP_EMAIL_ADDRESS : get_option( $this->option_prefix . 'help_email_address', get_option( 'admin_email', '' ) );
+
 		// check for spam here
 		$spam = apply_filters( $this->option_prefix . 'check_spam', false, $_POST );
 		if ( true === $spam ) {
@@ -144,10 +146,10 @@ class Form_Processor_Mailchimp_MC {
 				'method' => $method,
 				'local'  => true,
 				'detail' => sprintf(
-					// translators: placeholder is the submitted email address
+					// translators: 1) is the submitted email address, 2) is the help email address
 					esc_html__( 'Oops! For some reason our automated system has flagged %1$s as a spam address. You can try to subscribe using a different address, or if you think this was in error contact us at %2$s.', 'form-processor-mailchimp' ),
 					'<strong>' . esc_attr( $params['email_address'] ) . '</strong>',
-					'<a href="mailto:feedback@minnpost.com">feedback@minnpost.com</a>'
+					'<a href="mailto:' . $help_email_address . '">' . $help_email_address . ''
 				),
 			);
 			return $result;

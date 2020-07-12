@@ -184,7 +184,7 @@ class Form_Processor_Mailchimp_Admin {
 		add_settings_section( $page, $title, null, $page );
 
 		$settings = array(
-			'mailchimp_api_key' => array(
+			'mailchimp_api_key'  => array(
 				'title'    => __( 'MailChimp API Key', 'form-processor-mailchimp' ),
 				'callback' => $callbacks['text'],
 				'page'     => $page,
@@ -195,7 +195,7 @@ class Form_Processor_Mailchimp_Admin {
 					'constant' => 'FORM_PROCESSOR_MC_MAILCHIMP_API_KEY',
 				),
 			),
-			'http_methods'      => array(
+			'http_methods'       => array(
 				'title'    => __( 'Allowed HTTP Methods', 'form-processor-mailchimp' ),
 				'callback' => $callbacks['checkboxes'],
 				'page'     => $page,
@@ -206,11 +206,26 @@ class Form_Processor_Mailchimp_Admin {
 					'items' => $this->get_mailchimp_http_method_options(),
 				),
 			),
+			'help_email_address' => array(
+				'title'    => __( 'Email Address For Help', 'form-processor-mailchimp' ),
+				'callback' => $callbacks['text'],
+				'page'     => $page,
+				'section'  => $section,
+				'args'     => array(
+					'type'     => 'text',
+					'desc'     => sprintf(
+						// translators: 1 is the default administrative email for this install
+						esc_html__( 'Enter an email address where users can get support. If left blank, this plugin will default to %1$s.', 'form-processor-mailchimp' ),
+						get_option( 'admin_email', '' )
+					),
+					'constant' => 'FORM_PROCESSOR_MC_MAILCHIMP_HELP_EMAIL_ADDRESS',
+				),
+			),
 		);
 
 		if ( true === form_processor_mailchimp()->akismet->akismet_is_available() ) {
 			$settings['check_akismet'] = array(
-				'title'    => __( 'Check for spam against Akismet API?', 'form-processor-mailchimp' ),
+				'title'    => __( 'Check For Spam Against Akismet API?', 'form-processor-mailchimp' ),
 				'callback' => $callbacks['text'],
 				'page'     => $page,
 				'section'  => $section,
