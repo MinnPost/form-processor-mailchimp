@@ -257,6 +257,21 @@ class Form_Processor_Mailchimp_MC {
 		if ( isset( $log_body ) ) {
 			$log_body = json_decode( $log_body, true );
 		}
+
+		// split up the arrays for logging parts.
+
+		// log body variables.
+		$log_status   = isset( $log_body['status'] ) ? $log_body['status'] : '';
+		$log_detail   = isset( $log_body['detail'] ) ? $log_body['detail'] : '';
+		$log_instance = isset( $log_body['instance'] ) ? $log_body['instance'] : '';
+		$log_type     = isset( $log_body['type'] ) ? $log_body['type'] : '';
+
+		// log request variables.
+		$log_request_path   = isset( $log_request['path'] ) ? $log_request['path'] : '';
+		$log_request_method = isset( $log_request['method'] ) ? $log_request['method'] : '';
+		$log_request_url    = isset( $log_request['url'] ) ? $log_request['url'] : '';
+		$log_request_body   = isset( $log_request['body'] ) ? $log_request['body'] : '';
+
 		$log_title = sprintf(
 			// translators: placeholders are: 1) method called in this class, 2) the api error message
 			esc_html__( 'MailChimp %1$s Error: %2$s', 'form-processor-mailchimp' ),
@@ -276,16 +291,16 @@ class Form_Processor_Mailchimp_MC {
 			'</p>' .
 			'<ul><li><strong>Method:</strong> %8$s</li><li><strong>Path:</strong> %9$s</li><li><strong>URL:</strong> %10$s</li><li><strong>Body:</strong> %11$s</li></ul>',
 			esc_html( $method ),
-			esc_html( $log_request['path'] ),
+			esc_html( $log_request_path ),
 			esc_attr( $reset ),
-			esc_html( $log_body['status'] ),
-			esc_html( $log_body['detail'] ),
-			esc_html( $log_body['instance'] ),
-			esc_html( $log_body['type'] ),
-			esc_html( $log_request['method'] ),
-			esc_html( $log_request['path'] ),
-			esc_html( $log_request['url'] ),
-			esc_html( $log_request['body'] )
+			esc_html( $log_status ),
+			esc_html( $log_detail ),
+			esc_html( $log_instance ),
+			esc_html( $log_type ),
+			esc_html( $log_request_method ),
+			esc_html( $log_request_path ),
+			esc_html( $log_request_url ),
+			esc_html( $log_request_body )
 		);
 
 		$log_entry = array(
