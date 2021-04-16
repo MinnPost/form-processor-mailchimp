@@ -205,7 +205,9 @@ class Form_Processor_Mailchimp_MC {
 		// create log entry if there is an error
 		$success = $this->mailchimp_api->success();
 		if ( false === $success ) {
-			$this->log_error( 'Send' );
+			$log_error        = $this->log_error( 'Send' );
+			$result['detail'] = $log_error;
+			$result['status'] = 408;
 		}
 
 		return $result;
@@ -312,5 +314,7 @@ class Form_Processor_Mailchimp_MC {
 		);
 
 		$this->logging->setup( $log_entry );
+
+		return $log_error;
 	}
 }
