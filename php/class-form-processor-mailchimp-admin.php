@@ -221,6 +221,18 @@ class Form_Processor_Mailchimp_Admin {
 					'constant' => 'FORM_PROCESSOR_MC_MAILCHIMP_HELP_EMAIL_ADDRESS',
 				),
 			),
+			'debug_mode'         => array(
+				'title'    => __( 'Debug mode?', 'form-processor-mailchimp' ),
+				'callback' => $callbacks['text'],
+				'page'     => $page,
+				'section'  => $section,
+				'args'     => array(
+					'type'     => 'checkbox',
+					'validate' => 'sanitize_text_field',
+					'desc'     => __( 'Debug mode can, combined with the Log Settings, log things like Mailchimp API requests. It can create a lot of entries if enabled; it is not recommended to use it in a production environment.', 'form-processor-mailchimp' ),
+					'constant' => '',
+				),
+			),
 		);
 
 		if ( true === form_processor_mailchimp()->akismet->akismet_is_available() ) {

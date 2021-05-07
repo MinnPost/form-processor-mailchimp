@@ -29,6 +29,8 @@ class Form_Processor_Mailchimp_MC {
 		$this->api_key       = '';
 		$this->mailchimp_api = '';
 
+		$this->debug = get_option( $this->option_prefix . 'debug_mode', false );
+
 		add_action( 'init', array( $this, 'add_actions' ) );
 
 	}
@@ -102,7 +104,10 @@ class Form_Processor_Mailchimp_MC {
 		if ( is_array( $cached ) ) {
 			$data = $cached;
 		} else {
-			$data   = $this->mailchimp_api->get( $call );
+			$data = $this->mailchimp_api->get( $call );
+			if ( 1 === (int) $this->debug ) {
+				$this->log_debug( 'Load', $data, $reset );
+			}
 			$cached = $this->wordpress->cache_set( $call, $data );
 			// create log entry if there is an error
 			$success = $this->mailchimp_api->success();
@@ -316,5 +321,80 @@ class Form_Processor_Mailchimp_MC {
 		$this->logging->setup( $log_entry );
 
 		return $log_error;
+	}
+
+	/**
+	* Create log entry
+	*
+	* @param string $method
+	* @param array $data
+	* @param bool $reset
+	*/
+	private function log_debug( $method = '', $data = array(), $reset = false ) {
+		error_log( 'start a debug' );
+		if ( 1 !== (int) $this->debug ) {
+			return;
+		}
+		error_log( 'continue a debug' );
+
+		$log_body    = $this->mailchimp_api->getLastResponse()['body'];
+		$log_request = $this->mailchimp_api->getLastRequest();
+		if ( isset( $log_body ) ) {
+			$log_body = json_decode( $log_body, true );
+		}
+
+		// split up the arrays for logging parts.
+
+		// log body variables.
+		$log_status   = isset( $log_body['status'] ) ? $log_body['status'] : '';
+		$log_detail   = isset( $log_body['detail'] ) ? $log_body['detail'] : '';
+		$log_instance = isset( $log_body['instance'] ) ? $log_body['instance'] : '';
+		$log_type     = isset( $log_body['type'] ) ? $log_body['type'] : '';
+
+		// log request variables.
+		$log_request_path   = isset( $log_request['path'] ) ? $log_request['path'] : '';
+		$log_request_method = isset( $log_request['method'] ) ? $log_request['method'] : '';
+		$log_request_url    = isset( $log_request['url'] ) ? $log_request['url'] : '';
+		$log_request_body   = isset( $log_request['body'] ) ? $log_request['body'] : '';
+
+		$log_title = sprintf(
+			// translators: placeholders are: 1) method called in this class
+			esc_html__( 'MailChimp %1$s Debug', 'form-processor-mailchimp' ),
+			esc_html( $method )
+		);
+		$log_message = sprintf(
+			'<p>' .
+			// translators: placeholders are: 1) method called in this class, 2) api call, 3) reset flag, 4) API response body status, 5) API response body detail, 6) API response body instance, 7) API response body type, 8) request method, 9) API path, 10) API full URL, 11) API request body
+			esc_html__( '%1$s call was %2$s and reset value was %3$s.', 'form-processor-mailchimp' ) .
+			'</p>' .
+			'<p>' .
+			esc_html__( 'API response body was: ', 'form-processor-mailchimp' ) .
+			'</p>' .
+			'<ul><li><strong>Status:</strong> %4$s</li><li><strong>Detail:</strong> %5$s</li><li><strong>Instance:</strong> %6$s</li><li><strong>Type:</strong> %7$s</li></ul>' .
+			esc_html__( 'API request was: ', 'form-processor-mailchimp' ) .
+			'</p>' .
+			'<ul><li><strong>Method:</strong> %8$s</li><li><strong>Path:</strong> %9$s</li><li><strong>URL:</strong> %10$s</li><li><strong>Body:</strong> %11$s</li></ul>',
+			esc_html( $method ),
+			esc_html( $log_request_path ),
+			esc_attr( $reset ),
+			esc_html( $log_status ),
+			esc_html( $log_detail ),
+			esc_html( $log_instance ),
+			esc_html( $log_type ),
+			esc_html( $log_request_method ),
+			esc_html( $log_request_path ),
+			esc_html( $log_request_url ),
+			esc_html( $log_request_body )
+		);
+
+		$log_entry = array(
+			'title'   => $log_title,
+			'message' => $log_message,
+			'trigger' => 0,
+			'parent'  => '',
+			'status'  => esc_attr( 'debug' ),
+		);
+
+		$this->logging->setup( $log_entry );
 	}
 }
