@@ -722,7 +722,7 @@ class Form_Processor_Mailchimp_Admin {
 		if ( ( 'options.php' !== $pagenow ) && ( ! isset( $_GET['page'] ) || $this->slug !== $_GET['page'] ) ) {
 			return;
 		}
-		$resources = $this->mailchimp->load( '' );
+		//$resources = $this->mailchimp->load( '' );
 		if ( ! empty( $resources['_links'] ) ) {
 			foreach ( $resources['_links'] as $link ) {
 				// this is where we check for supported resources. again, ideally this would go away one day.
@@ -752,7 +752,7 @@ class Form_Processor_Mailchimp_Admin {
 		if ( ( 'options.php' !== $pagenow ) && ( ! isset( $_GET['page'] ) || $this->slug !== $_GET['page'] ) ) {
 			return;
 		}
-		$resources = $this->mailchimp->load( $resource_type );
+		//$resources = $this->mailchimp->load( $resource_type );
 		if ( is_array( $resources[ $resource_type ] ) ) {
 			foreach ( $resources[ $resource_type ] as $resource ) {
 				$options[ $resource['id'] ] = array(
@@ -780,7 +780,7 @@ class Form_Processor_Mailchimp_Admin {
 		if ( ( 'options.php' !== $pagenow ) && ( ! isset( $_GET['page'] ) || $this->slug !== $_GET['page'] ) ) {
 			return;
 		}
-		$subresource_types = $this->mailchimp->load( $resource_type );
+		//$subresource_types = $this->mailchimp->load( $resource_type );
 		if ( is_array( $subresource_types[ $resource_type ][0]['_links'] ) ) {
 			foreach ( $subresource_types[ $resource_type ][0]['_links'] as $link ) {
 				if ( ! in_array( $link['rel'], array( 'self', 'parent', 'update', 'delete' ), true ) ) {
@@ -812,7 +812,7 @@ class Form_Processor_Mailchimp_Admin {
 		if ( ( 'options.php' !== $pagenow ) && ( ! isset( $_GET['page'] ) || $this->slug !== $_GET['page'] ) ) {
 			return;
 		}
-		$subresources = $this->mailchimp->load( $resource_type . '/' . $resource_id . '/' . $subresource_type );
+		//$subresources = $this->mailchimp->load( $resource_type . '/' . $resource_id . '/' . $subresource_type );
 
 		$key = $subresource_type;
 		if ( ! isset( $subresources[ $key ] ) ) {

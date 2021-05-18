@@ -102,6 +102,7 @@ class Form_Processor_Mailchimp_MC {
 		$method           = isset( $params['method'] ) ? $params['method'] : '';
 		$cached           = $this->wordpress->cache_get( $call, $reset );
 		if ( is_array( $cached ) ) {
+			error_log( 'call is ' . $call );
 			$data = $cached;
 		} else {
 			$data = $this->mailchimp_api->get( $call );

@@ -33,6 +33,9 @@ class Form_Processor_Mailchimp_WP {
 	 * @return $this->mc_form_transients->get $cachekey
 	 */
 	public function cache_get( $call, $reset = false ) {
+		if ( false === $this->cache ) {
+			return false;
+		}
 		$cachekey = md5( wp_json_encode( $call ) );
 		return $this->mc_form_transients->get( $cachekey, $reset );
 	}
